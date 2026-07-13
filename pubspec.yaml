@@ -1,0 +1,65 @@
+name: almaty_zhk_app
+description: Карта проблемных и надёжных ЖК Алматы
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Карта: OpenStreetMap-based, без привязки к Google — свободно меняем
+  # источник тайлов (сейчас MapTiler, можно на свой self-hosted сервер).
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
+  geolocator: ^11.1.0
+
+  # Бэкенд: Auth + Postgres (можно перейти на self-hosted Supabase позже
+  # без изменения кода — просто меняем URL).
+  supabase_flutter: ^2.5.6
+
+  # Управление состоянием (избранное, авторизация)
+  provider: ^6.1.2
+
+  # Выбор файла фото для загрузки в Supabase Storage (работает и в web)
+  image_picker: ^1.0.7
+
+  # Хранение настроек (тема) на устройстве
+  shared_preferences: ^2.2.3
+
+  # Открытие звонка/письма из "О приложении"
+  url_launcher: ^6.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.7
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/almaty_zhk_data.json
+    - assets/icon/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    background_color: "#2454FF"
+    theme_color: "#2454FF"
+  image_path: "assets/icon/app_icon.png"
+
+flutter_native_splash:
+  color: "#2454FF"
+  image: "assets/icon/splash_icon.png"
+  android_12:
+    color: "#2454FF"
+    image: "assets/icon/splash_icon.png"
+  web: false
