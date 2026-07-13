@@ -41,12 +41,24 @@
 </head>
 <body>
   <script>
+    // На проде PWA-офлайн-кэш не нужен, а его гонки версий на мобильных
+    // браузерах вызывали бесконечную перезагрузку страницы — снимаем
+    // регистрацию у всех уже установленных воркеров и грузим приложение
+    // без него.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (const registration of registrations) registration.unregister();
+      });
+      if (window.caches) {
+        caches.keys().then(function (names) {
+          for (const name of names) caches.delete(name);
+        });
+      }
+    }
+
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             appRunner.runApp();
