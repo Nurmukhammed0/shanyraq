@@ -24,7 +24,7 @@ jobs:
           flutter-version: '3.13.0'
           channel: stable
       - run: flutter pub get
-      - run: flutter build web --release --base-href /shanyraq/ --no-tree-shake-icons
+      - run: flutter build web --release --base-href /shanyraq/ --no-tree-shake-icons --web-renderer html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
