@@ -239,9 +239,11 @@ class _MapScreenState extends State<MapScreen> {
     final points = _filtered;
     final withoutCoords = _all.where((z) => !z.hasCoordinates).length;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // CARTO теперь требует платный API-ключ для basemaps.cartocdn.com —
+    // используем бесплатные тайлы Esri (ключ не нужен).
     final tileUrl = isDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+        : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
     final topInset = MediaQuery.of(context).padding.top;
 
@@ -266,7 +268,6 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     TileLayer(
                       urlTemplate: tileUrl,
-                      subdomains: const ['a', 'b', 'c', 'd'],
                       userAgentPackageName: 'com.example.almaty_zhk_app',
                     ),
                     if (isDark)
@@ -279,8 +280,7 @@ class _MapScreenState extends State<MapScreen> {
                     const RichAttributionWidget(
                       alignment: AttributionAlignment.bottomLeft,
                       attributions: [
-                        TextSourceAttribution('OpenStreetMap contributors'),
-                        TextSourceAttribution('CARTO'),
+                        TextSourceAttribution('Esri'),
                       ],
                     ),
                     MarkerLayer(
