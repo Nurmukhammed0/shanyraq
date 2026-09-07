@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'root_shell.dart';
+import 'auth_gate.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -54,7 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await prefs.setBool(OnboardingScreen._seenKey, true);
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const RootShell()),
+      MaterialPageRoute(builder: (_) => const AuthGate()),
     );
   }
 

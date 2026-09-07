@@ -7,6 +7,7 @@ import '../widgets/app_logo.dart';
 
 const _supportPhone = '+7 771 470 72 22';
 const _supportEmail = 'nurbeekovn@gmail.com';
+const _priceLabel = '3 000 ₸ / мес';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});
@@ -86,40 +87,131 @@ class SubscriptionScreen extends StatelessWidget {
         ..._benefits.map((b) => _BenefitRow(title: b.$1, subtitle: b.$2, icon: b.$3, unlocked: false)),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(16),
+            color: colorScheme.primaryContainer.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(18),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text('Как оформить', style: Theme.of(context).textTheme.titleSmall),
-              const SizedBox(height: 8),
-              Text(
-                'Онлайн-оплата пока не подключена — активируем вручную. '
-                'Напишите или позвоните, укажите свой email${profile.email != null ? ' (${profile.email})' : ''}, '
-                'и мы включим подписку.',
-                style: const TextStyle(height: 1.4, fontSize: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Подписка', style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant)),
+                    const SizedBox(height: 2),
+                    const Text(_priceLabel,
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
+              Icon(Icons.workspace_premium, color: colorScheme.primary, size: 32),
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        FilledButton.icon(
-          onPressed: () => launchUrl(Uri(scheme: 'mailto', path: _supportEmail)),
+        const SizedBox(height: 16),
+        FilledButton(
+          onPressed: () => _subscribe(context),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          icon: const Icon(Icons.mail_outline, size: 20),
-          label: const Text('Написать на почту'),
+          child: const Text('Оформить подписку'),
         ),
-        const SizedBox(height: 10),
-        OutlinedButton.icon(
-          onPressed: () => launchUrl(Uri(scheme: 'tel', path: _supportPhone.replaceAll(' ', ''))),
-          style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          icon: const Icon(Icons.phone_outlined, size: 20),
-          label: const Text('Позвонить: $_supportPhone'),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            onPressed: () => launchUrl(Uri(scheme: 'mailto', path: _supportEmail)),
+            child: const Text('Есть вопросы? Написать в поддержку'),
+          ),
         ),
       ],
+    );
+  }
+
+  Future<void> _subscribe(BuildContext context) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _FakePaymentDialog(),
+    );
+  }
+}
+
+/// Имитация оплаты: пока не подключён настоящий платёжный шлюз, просто
+/// показываем анимацию процесса и помечаем пользователя подписанным.
+/// Когда появится реальный API — вызывать активацию из подтверждения
+/// платежа (вебхук), а не сразу по нажатию кнопки.
+class _FakePaymentDialog extends StatefulWidget {
+  const _FakePaymentDialog();
+
+  @override
+  State<_FakePaymentDialog> createState() => _FakePaymentDialogState();
+}
+
+class _FakePaymentDialogState extends State<_FakePaymentDialog> {
+  bool _success = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _run();
+  }
+
+  Future<void> _run() async {
+    await Future.delayed(const Duration(milliseconds: 1400));
+    if (!mounted) return;
+    try {
+      await context.read<ProfileService>().activateSubscription();
+      if (!mounted) return;
+      setState(() => _success = true);
+      await Future.delayed(const Duration(milliseconds: 900));
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _error = '$e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_error != null) ...[
+              const Icon(Icons.error_outline, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
+              Text('Не получилось: $_error', textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Закрыть'),
+              ),
+            ] else if (_success) ...[
+              Container(
+                width: 64,
+                height: 64,
+                decoration: const BoxDecoration(color: Color(0xFF22C55E), shape: BoxShape.circle),
+                child: const Icon(Icons.check, color: Colors.white, size: 32),
+              ),
+              const SizedBox(height: 16),
+              const Text('Оплата прошла успешно',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            ] else ...[
+              const SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(strokeWidth: 3),
+              ),
+              const SizedBox(height: 16),
+              const Text('Обрабатываем платёж...', style: TextStyle(fontWeight: FontWeight.w600)),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

@@ -7,8 +7,8 @@ import 'services/favorites_service.dart';
 import 'services/profile_service.dart';
 import 'services/settings_service.dart';
 import 'l10n/app_strings.dart';
+import 'screens/auth_gate.dart';
 import 'screens/onboarding_screen.dart';
-import 'screens/root_shell.dart';
 
 // TODO: замените на данные вашего Supabase-проекта
 // (Settings -> API в дашборде Supabase). Можно указать и URL
@@ -55,7 +55,8 @@ class AlmatyZhkApp extends StatelessWidget {
   }
 }
 
-/// Показывает онбординг только при первом запуске, дальше — сразу RootShell.
+/// Показывает онбординг только при первом запуске, дальше — экран входа
+/// (без авторизации в приложение попасть нельзя).
 class _AppEntry extends StatelessWidget {
   const _AppEntry();
 
@@ -67,7 +68,7 @@ class _AppEntry extends StatelessWidget {
         if (!snapshot.hasData) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
-        return snapshot.data! ? const RootShell() : const OnboardingScreen();
+        return snapshot.data! ? const AuthGate() : const OnboardingScreen();
       },
     );
   }

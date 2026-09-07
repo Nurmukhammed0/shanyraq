@@ -27,6 +27,14 @@ class ProfileService extends ChangeNotifier {
     await load();
   }
 
+  // TODO: пока имитация оплаты — просто помечает пользователя подписанным.
+  // Когда подключите платёжный шлюз, вызывайте activate_own_subscription
+  // из вебхука после подтверждения платежа, а не по нажатию кнопки.
+  Future<void> activateSubscription() async {
+    await _client.rpc('activate_own_subscription');
+    await load();
+  }
+
   Future<void> load() async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) {
