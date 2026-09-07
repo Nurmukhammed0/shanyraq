@@ -264,30 +264,15 @@ class _MapScreenState extends State<MapScreen> {
                         : null,
                   ),
                   children: [
+                    TileLayer(
+                      urlTemplate: tileUrl,
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                      userAgentPackageName: 'com.example.almaty_zhk_app',
+                    ),
                     if (isDark)
-                      ColorFiltered(
-                        // Dark Matter из коробки слишком тёмный — поднимаем
-                        // яркость без смещения оттенка (иначе уже синяя
-                        // вода на тайлах становится кислотной).
-                        colorFilter: const ColorFilter.matrix([
-                          1.3, 0, 0, 0, 25,
-                          0, 1.3, 0, 0, 25,
-                          0, 0, 1.3, 0, 25,
-                          0, 0, 0, 1, 0,
-                        ]),
-                        child: TileLayer(
-                          urlTemplate: tileUrl,
-                          subdomains: const ['a', 'b', 'c', 'd'],
-                          userAgentPackageName: 'com.example.almaty_zhk_app',
-                        ),
-                      )
-                    else
-                      TileLayer(
-                        urlTemplate: tileUrl,
-                        subdomains: const ['a', 'b', 'c', 'd'],
-                        userAgentPackageName: 'com.example.almaty_zhk_app',
-                      ),
-                    if (isDark)
+                      // Лёгкий полупрозрачный оверлей вместо ColorFiltered-матрицы:
+                      // SVG color-matrix фильтр поверх целой карты — известный
+                      // источник крашей WebKit на iOS в html-рендерере Flutter Web.
                       IgnorePointer(
                         child: Container(color: const Color(0xFF13224A).withOpacity(0.16)),
                       ),
