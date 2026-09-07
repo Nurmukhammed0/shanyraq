@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/google_sign_in_button.dart';
+import '../widgets/password_strength_meter.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,10 +18,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   bool _loading = false;
   bool _obscurePassword = true;
+  String _password = '';
   String? _error;
   String? _info;
 
   Future<void> _submit() async {
+    if (!PasswordCheck.evaluate(_password).isValid) {
+      setState(() => _error = context.tr('password_requirements_error'));
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
@@ -57,15 +63,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   const Center(child: AppLogo()),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Добро пожаловать',
+                  Text(
+                    context.tr('register_heading'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Создайте аккаунт, чтобы сохранять ЖК в избранное и следить '
-                    'за изменением их статуса',
+                    context.tr('register_subtitle'),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.4),
                   ),
@@ -82,6 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    onChanged: (v) => setState(() => _password = v),
                     decoration: InputDecoration(
                       labelText: context.tr('password_min_label'),
                       prefixIcon: const Icon(Icons.lock_outline, size: 20),
@@ -94,6 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
+                  PasswordStrengthMeter(password: _password),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     Text(_error!, style: const TextStyle(color: Colors.red)),
@@ -120,7 +127,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Expanded(child: Divider(color: colorScheme.outlineVariant)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('или', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13)),
+                        child: Text(context.tr('divider_or'),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13)),
                       ),
                       Expanded(child: Divider(color: colorScheme.outlineVariant)),
                     ],

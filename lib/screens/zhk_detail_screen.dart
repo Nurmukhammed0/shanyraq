@@ -41,7 +41,7 @@ class ZhkDetailScreen extends StatelessWidget {
       if (updated.isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Объект не удалён: сервер не нашёл строку (проверьте id/RLS).')),
+            SnackBar(content: Text(context.tr('zhk_delete_not_found'))),
           );
         }
         return;
@@ -49,7 +49,7 @@ class ZhkDetailScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Ошибка удаления: $e')));
+            .showSnackBar(SnackBar(content: Text(context.tr('zhk_delete_error', {'error': '$e'}))));
       }
       return;
     }
@@ -81,7 +81,8 @@ class ZhkDetailScreen extends StatelessWidget {
         await favorites.toggle(zhk.id);
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(context.tr('generic_error', {'error': '$e'}))));
         }
       }
     }
@@ -201,7 +202,7 @@ class ZhkDetailScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.flag_outlined, size: 18),
-                  label: const Text('Сообщить об ошибке в данных'),
+                  label: Text(context.tr('zhk_report_issue_button')),
                   onPressed: () async {
                     if (!auth.isLoggedIn) {
                       await Navigator.of(context).push(

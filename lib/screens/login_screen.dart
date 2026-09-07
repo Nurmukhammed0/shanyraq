@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Войдите, чтобы сохранять избранное и получать уведомления об изменениях',
+                    context.tr('login_subtitle'),
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.4),
                   ),
@@ -114,7 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       Expanded(child: Divider(color: colorScheme.outlineVariant)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('или', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13)),
+                        child: Text(context.tr('divider_or'),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13)),
                       ),
                       Expanded(child: Divider(color: colorScheme.outlineVariant)),
                     ],

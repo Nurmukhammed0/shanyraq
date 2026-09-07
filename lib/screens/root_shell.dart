@@ -127,7 +127,7 @@ class _ProfileView extends StatelessWidget {
           const SizedBox(height: 20),
           _ProfileTile(
             icon: Icons.edit_outlined,
-            title: 'Редактировать профиль',
+            title: context.tr('edit_profile_title'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const EditProfileScreen()),
             ),
@@ -156,7 +156,7 @@ class _ProfileView extends StatelessWidget {
             ),
           _ProfileTile(
             icon: Icons.info_outline,
-            title: 'О приложении',
+            title: context.tr('about_title'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const AboutScreen()),
             ),

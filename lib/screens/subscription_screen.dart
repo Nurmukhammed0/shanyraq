@@ -7,18 +7,22 @@ import '../widgets/app_logo.dart';
 
 const _supportPhone = '+7 771 470 72 22';
 const _supportEmail = 'nurbeekovn@gmail.com';
-const _priceLabel = '3 000 ₸ / мес';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});
 
-  static const _benefits = [
-    ('Статус риска на карте', 'Красная зона или госгарантия — сразу видно на маркере', Icons.location_on_outlined),
-    ('Разрешительная документация', 'Что оформлено, а что отсутствует у застройщика', Icons.description_outlined),
-    ('Нарушения и меры', 'Полная история претензий и принятых мер', Icons.gavel_outlined),
-    ('Судебный статус', 'Есть ли иски, решения о сносе, исполнительные листы', Icons.balance_outlined),
-    ('Уведомления', 'Сообщим, если статус избранного ЖК изменится', Icons.notifications_active_outlined),
-  ];
+  static List<(String, String, IconData)> _benefits(BuildContext context) => [
+        (context.tr('sub_benefit_status_title'), context.tr('sub_benefit_status_subtitle'),
+            Icons.location_on_outlined),
+        (context.tr('sub_benefit_docs_title'), context.tr('sub_benefit_docs_subtitle'),
+            Icons.description_outlined),
+        (context.tr('sub_benefit_violations_title'), context.tr('sub_benefit_violations_subtitle'),
+            Icons.gavel_outlined),
+        (context.tr('sub_benefit_court_title'), context.tr('sub_benefit_court_subtitle'),
+            Icons.balance_outlined),
+        (context.tr('sub_benefit_notifications_title'), context.tr('sub_benefit_notifications_subtitle'),
+            Icons.notifications_active_outlined),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +63,7 @@ class SubscriptionScreen extends StatelessWidget {
           style: TextStyle(fontSize: 15, color: colorScheme.onSurfaceVariant, height: 1.4),
         ),
         const SizedBox(height: 32),
-        ..._benefits.map((b) => _BenefitRow(title: b.$1, subtitle: b.$2, icon: b.$3, unlocked: true)),
+        ..._benefits(context).map((b) => _BenefitRow(title: b.$1, subtitle: b.$2, icon: b.$3, unlocked: true)),
       ],
     );
   }
@@ -71,20 +75,19 @@ class SubscriptionScreen extends StatelessWidget {
         const SizedBox(height: 8),
         const Center(child: AppLogo(size: 64)),
         const SizedBox(height: 20),
-        const Text(
-          'Полная картина перед покупкой',
+        Text(
+          context.tr('subscription_paywall_heading'),
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, height: 1.2),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, height: 1.2),
         ),
         const SizedBox(height: 8),
         Text(
-          'Адрес и застройщик видны всем бесплатно. Подписка открывает то,\n'
-          'что реально влияет на решение о покупке.',
+          context.tr('subscription_paywall_body'),
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.4),
         ),
         const SizedBox(height: 28),
-        ..._benefits.map((b) => _BenefitRow(title: b.$1, subtitle: b.$2, icon: b.$3, unlocked: false)),
+        ..._benefits(context).map((b) => _BenefitRow(title: b.$1, subtitle: b.$2, icon: b.$3, unlocked: false)),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(20),
@@ -98,10 +101,11 @@ class SubscriptionScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Подписка', style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant)),
+                    Text(context.tr('subscription_price_label'),
+                        style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant)),
                     const SizedBox(height: 2),
-                    const Text(_priceLabel,
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    Text(context.tr('subscription_price_value'),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -113,13 +117,13 @@ class SubscriptionScreen extends StatelessWidget {
         FilledButton(
           onPressed: () => _subscribe(context),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          child: const Text('Оформить подписку'),
+          child: Text(context.tr('subscription_subscribe_button')),
         ),
         const SizedBox(height: 16),
         Center(
           child: TextButton(
             onPressed: () => launchUrl(Uri(scheme: 'mailto', path: _supportEmail)),
-            child: const Text('Есть вопросы? Написать в поддержку'),
+            child: Text(context.tr('subscription_support_link')),
           ),
         ),
       ],
@@ -184,11 +188,11 @@ class _FakePaymentDialogState extends State<_FakePaymentDialog> {
             if (_error != null) ...[
               const Icon(Icons.error_outline, color: Colors.red, size: 48),
               const SizedBox(height: 16),
-              Text('Не получилось: $_error', textAlign: TextAlign.center),
+              Text(context.tr('payment_error', {'error': '$_error'}), textAlign: TextAlign.center),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Закрыть'),
+                child: Text(context.tr('close')),
               ),
             ] else if (_success) ...[
               Container(
@@ -198,8 +202,8 @@ class _FakePaymentDialogState extends State<_FakePaymentDialog> {
                 child: const Icon(Icons.check, color: Colors.white, size: 32),
               ),
               const SizedBox(height: 16),
-              const Text('Оплата прошла успешно',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+              Text(context.tr('payment_success'),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             ] else ...[
               const SizedBox(
                 width: 40,
@@ -207,7 +211,7 @@ class _FakePaymentDialogState extends State<_FakePaymentDialog> {
                 child: CircularProgressIndicator(strokeWidth: 3),
               ),
               const SizedBox(height: 16),
-              const Text('Обрабатываем платёж...', style: TextStyle(fontWeight: FontWeight.w600)),
+              Text(context.tr('payment_processing'), style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ],
         ),

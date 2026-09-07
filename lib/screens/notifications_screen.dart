@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/favorites_service.dart';
 import '../widgets/empty_state_illustration.dart';
 
@@ -79,23 +80,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить уведомления: $e';
+        _error = context.tr('notifications_load_error', {'error': '$e'});
         _loading = false;
       });
     }
   }
 
-  String _statusLabel(String? status) => switch (status) {
-        'problematic' => 'Красная зона',
-        'completed_guaranteed' => 'Госгарантия',
-        _ => 'неизвестно',
+  String _statusLabel(BuildContext context, String? status) => switch (status) {
+        'problematic' => context.tr('notif_status_problematic'),
+        'completed_guaranteed' => context.tr('notif_status_guaranteed'),
+        _ => context.tr('notif_status_unknown'),
       };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Уведомления'),
+        title: Text(context.tr('notifications_title')),
         actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _load)],
       ),
       body: _loading
@@ -111,12 +112,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           children: [
                             const EmptyStateIllustration(badgeIcon: Icons.notifications),
                             const SizedBox(height: 20),
-                            const Text('Пока всё тихо',
-                                style: TextStyle(fontWeight: FontWeight.w600)),
+                            Text(context.tr('notifications_empty_title'),
+                                style: const TextStyle(fontWeight: FontWeight.w600)),
                             const SizedBox(height: 8),
                             Text(
-                              'Как только статус вашего избранного ЖК изменится — '
-                              'сразу сообщим здесь',
+                              context.tr('notifications_empty_body'),
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                             ),
@@ -130,8 +130,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       itemBuilder: (context, i) {
                         final r = _rows[i];
                         final name = (r['zhk'] as Map?)?['name'] as String? ?? r['zhk_id'];
-                        final oldStatus = _statusLabel(r['old_status'] as String?);
-                        final newStatus = _statusLabel(r['new_status'] as String?);
+                        final oldStatus = _statusLabel(context, r['old_status'] as String?);
+                        final newStatus = _statusLabel(context, r['new_status'] as String?);
                         return ListTile(
                           leading: const Icon(Icons.notifications_active_outlined),
                           title: Text(name),

@@ -69,7 +69,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text('Ошибка загрузки избранного: $_error'),
+                    child: Text(context.tr('favorites_load_error', {'error': '$_error'})),
                   ),
                 )
               : favZhk.isEmpty
@@ -87,8 +87,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               await favorites.remove(z.id);
                             } catch (e) {
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Ошибка: $e')));
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text(context.tr('generic_error', {'error': '$e'}))));
                               }
                             }
                           },

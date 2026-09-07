@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../widgets/section_card.dart';
@@ -43,12 +44,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             avatarUrl: context.read<ProfileService>().avatarUrl,
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Сохранено')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('profile_save_success'))));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Ошибка сохранения: $e')));
+            .showSnackBar(SnackBar(content: Text(context.tr('profile_save_error', {'error': '$e'}))));
       }
     } finally {
       if (mounted) setState(() => _savingProfile = false);
@@ -79,8 +81,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Ошибка загрузки фото: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.tr('profile_photo_upload_error', {'error': '$e'}))));
       }
     } finally {
       if (mounted) setState(() => _uploadingAvatar = false);
@@ -90,7 +92,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _changePassword() async {
     if (_newPasswordController.text.trim().length < 6) {
       setState(() {
-        _passwordError = 'Минимум 6 символов';
+        _passwordError = context.tr('profile_password_too_short');
         _passwordSuccess = null;
       });
       return;
@@ -105,7 +107,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _changingPassword = false;
       _passwordError = error;
-      _passwordSuccess = error == null ? 'Пароль изменён' : null;
+      _passwordSuccess = error == null ? context.tr('profile_password_changed') : null;
       if (error == null) _newPasswordController.clear();
     });
   }
@@ -114,16 +116,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить аккаунт?'),
-        content: const Text(
-          'Аккаунт и всё избранное будут удалены безвозвратно. Это действие нельзя отменить.',
-        ),
+        title: Text(context.tr('profile_delete_confirm_title')),
+        content: Text(context.tr('profile_delete_confirm_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.tr('cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить аккаунт'),
+            child: Text(context.tr('profile_delete_button')),
           ),
         ],
       ),
@@ -148,7 +148,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Редактировать профиль')),
+      appBar: AppBar(title: Text(context.tr('edit_profile_title'))),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -206,13 +206,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 28),
           SectionCard(
             icon: Icons.badge_outlined,
-            title: 'Имя',
+            title: context.tr('profile_section_name'),
             children: [
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  hintText: 'Ваше имя',
-                  prefixIcon: Icon(Icons.person_outline, size: 20),
+                decoration: InputDecoration(
+                  hintText: context.tr('profile_name_hint'),
+                  prefixIcon: const Icon(Icons.person_outline, size: 20),
                 ),
               ),
               const SizedBox(height: 14),
@@ -225,7 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           height: 18,
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Сохранить имя'),
+                      : Text(context.tr('profile_save_name_button')),
                 ),
               ),
             ],
@@ -233,14 +233,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 16),
           SectionCard(
             icon: Icons.lock_outline,
-            title: 'Пароль',
+            title: context.tr('profile_section_password'),
             children: [
               TextField(
                 controller: _newPasswordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Новый пароль (мин. 6 символов)',
-                  prefixIcon: Icon(Icons.lock_outline, size: 20),
+                decoration: InputDecoration(
+                  hintText: context.tr('profile_new_password_hint'),
+                  prefixIcon: const Icon(Icons.lock_outline, size: 20),
                 ),
               ),
               if (_passwordError != null) ...[
@@ -260,7 +260,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: _changingPassword
                       ? const SizedBox(
                           height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Сменить пароль'),
+                      : Text(context.tr('profile_change_password_button')),
                 ),
               ),
             ],
@@ -280,14 +280,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     Icon(Icons.warning_amber_rounded, size: 18, color: colorScheme.error),
                     const SizedBox(width: 8),
-                    Text('Опасная зона',
+                    Text(context.tr('profile_danger_zone_title'),
                         style: TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 14.5, color: colorScheme.error)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Аккаунт и всё избранное будут удалены безвозвратно.',
+                  context.tr('profile_danger_zone_body'),
                   style: TextStyle(
                       fontSize: 12.5, color: colorScheme.error.withOpacity(0.85), height: 1.35),
                 ),
@@ -306,7 +306,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             width: 18,
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: colorScheme.error))
-                        : const Text('Удалить аккаунт'),
+                        : Text(context.tr('profile_delete_button')),
                   ),
                 ),
               ],

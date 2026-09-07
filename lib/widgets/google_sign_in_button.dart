@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 
 class GoogleSignInButton extends StatefulWidget {
@@ -39,7 +40,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               children: [
                 Image.asset('assets/icon/google_logo.png', width: 20, height: 20),
                 const SizedBox(width: 12),
-                Text('Продолжить с Google', style: TextStyle(color: colorScheme.onSurface)),
+                Text(context.tr('google_continue'), style: TextStyle(color: colorScheme.onSurface)),
               ],
             ),
     );

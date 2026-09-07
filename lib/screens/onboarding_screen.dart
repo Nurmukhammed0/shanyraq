@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_strings.dart';
 import 'auth_gate.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -24,26 +25,23 @@ class _Page {
   const _Page({required this.icon, required this.title, required this.body});
 }
 
-const _pages = [
-  _Page(
-    icon: Icons.map_outlined,
-    title: 'Шаңырақ — дом на карте',
-    body: 'Показываем на карте проблемные жилые комплексы и объекты, '
-        'завершённые под госгарантией — чтобы вы видели риски до сделки.',
-  ),
-  _Page(
-    icon: Icons.warning_amber_outlined,
-    title: 'Красная зона и гарантия',
-    body: 'Красный маркер — у объекта есть нарушения или проблемы со стройкой. '
-        'Зелёный — комплекс сдан под госгарантией дольщикам.',
-  ),
-  _Page(
-    icon: Icons.workspace_premium_outlined,
-    title: 'Подробности по подписке',
-    body: 'Базовая информация (адрес, застройщик) доступна всем бесплатно. '
-        'Детали — нарушения, суд, документация — открываются по подписке.',
-  ),
-];
+List<_Page> _pages(BuildContext context) => [
+      _Page(
+        icon: Icons.map_outlined,
+        title: context.tr('onboarding_title_1'),
+        body: context.tr('onboarding_body_1'),
+      ),
+      _Page(
+        icon: Icons.warning_amber_outlined,
+        title: context.tr('onboarding_title_2'),
+        body: context.tr('onboarding_body_2'),
+      ),
+      _Page(
+        icon: Icons.workspace_premium_outlined,
+        title: context.tr('onboarding_title_3'),
+        body: context.tr('onboarding_body_3'),
+      ),
+    ];
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _controller = PageController();
@@ -61,7 +59,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isLast = _index == _pages.length - 1;
+    final pages = _pages(context);
+    final isLast = _index == pages.length - 1;
 
     return Scaffold(
       body: SafeArea(
@@ -71,16 +70,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: _finish,
-                child: const Text('Пропустить'),
+                child: Text(context.tr('onboarding_skip')),
               ),
             ),
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (context, i) {
-                  final page = _pages[i];
+                  final page = pages[i];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
@@ -111,7 +110,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (i) {
+              children: List.generate(pages.length, (i) {
                 final active = i == _index;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
@@ -136,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             duration: const Duration(milliseconds: 250),
                             curve: Curves.easeOut,
                           ),
-                  child: Text(isLast ? 'Начать' : 'Далее'),
+                  child: Text(isLast ? context.tr('onboarding_start') : context.tr('onboarding_next')),
                 ),
               ),
             ),

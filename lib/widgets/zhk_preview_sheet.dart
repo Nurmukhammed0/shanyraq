@@ -128,8 +128,8 @@ class _ZhkPreviewSheet extends StatelessWidget {
                       await favorites.toggle(zhk.id);
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(context.tr('generic_error', {'error': '$e'}))));
                       }
                     }
                   },

@@ -419,7 +419,7 @@ class _MapScreenState extends State<MapScreen> {
                                         : Icons.notifications_none,
                                   ),
                                 ),
-                                tooltip: 'Уведомления',
+                                tooltip: context.tr('map_notifications_tooltip'),
                                 onPressed: _openNotifications,
                               ),
                             ),
@@ -461,7 +461,7 @@ class _MapScreenState extends State<MapScreen> {
                         child: Column(
                           children: [
                             IconButton(
-                              tooltip: 'Мой геолокация',
+                              tooltip: context.tr('map_locate_tooltip'),
                               onPressed: _locating ? null : _locateMe,
                               icon: _locating
                                   ? const SizedBox(
@@ -473,7 +473,7 @@ class _MapScreenState extends State<MapScreen> {
                             ),
                             Divider(height: 1, color: Theme.of(context).colorScheme.outlineVariant),
                             IconButton(
-                              tooltip: 'Увеличить',
+                              tooltip: context.tr('map_zoom_in_tooltip'),
                               onPressed: () => _mapController.move(
                                 _mapController.camera.center,
                                 _mapController.camera.zoom + 1,
@@ -482,7 +482,7 @@ class _MapScreenState extends State<MapScreen> {
                             ),
                             Divider(height: 1, color: Theme.of(context).colorScheme.outlineVariant),
                             IconButton(
-                              tooltip: 'Уменьшить',
+                              tooltip: context.tr('map_zoom_out_tooltip'),
                               onPressed: () => _mapController.move(
                                 _mapController.camera.center,
                                 _mapController.camera.zoom - 1,
