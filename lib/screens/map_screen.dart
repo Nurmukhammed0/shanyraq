@@ -49,9 +49,7 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _load();
     _refreshUnseenNotifications();
-    // Временно отключено: диагностируем краш на iOS Safari через ~10с
-    // после открытия карты — подозреваем постоянное realtime-соединение.
-    // _subscribeToRealtime();
+    _subscribeToRealtime();
   }
 
   void _subscribeToRealtime() {
