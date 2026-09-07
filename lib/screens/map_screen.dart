@@ -259,7 +259,10 @@ class _MapScreenState extends State<MapScreen> {
                     initialCenter: _almatyCenter,
                     initialZoom: 11,
                     interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.all,
+                      // Поворот карты выключен: наши маркеры-капли не
+                      // разворачиваются вместе с картой, при вращении
+                      // выглядят и работают некорректно.
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                     ),
                     onLongPress: profile.isAdmin
                         ? (tapPosition, point) => _addZhkAt(point)
