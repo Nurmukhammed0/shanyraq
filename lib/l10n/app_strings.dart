@@ -670,6 +670,51 @@ class AppStrings {
       AppLanguage.kz: 'Сәтсіз аяқталды: {error}',
       AppLanguage.en: 'Something went wrong: {error}',
     },
+    'subscription_choose_payment': {
+      AppLanguage.ru: 'Выберите способ оплаты',
+      AppLanguage.kz: 'Төлем әдісін таңдаңыз',
+      AppLanguage.en: 'Choose a payment method',
+    },
+    'subscription_pay_card': {
+      AppLanguage.ru: 'Оплатить картой',
+      AppLanguage.kz: 'Картамен төлеу',
+      AppLanguage.en: 'Pay with card',
+    },
+    'subscription_pay_apple': {
+      AppLanguage.ru: 'Apple ID',
+      AppLanguage.kz: 'Apple ID',
+      AppLanguage.en: 'Apple ID',
+    },
+    'subscription_card_number_hint': {
+      AppLanguage.ru: 'Номер карты',
+      AppLanguage.kz: 'Карта нөмірі',
+      AppLanguage.en: 'Card number',
+    },
+    'subscription_pay_button': {
+      AppLanguage.ru: 'Оплатить',
+      AppLanguage.kz: 'Төлеу',
+      AppLanguage.en: 'Pay',
+    },
+    'subscription_payment_method_label': {
+      AppLanguage.ru: 'Способ оплаты',
+      AppLanguage.kz: 'Төлем әдісі',
+      AppLanguage.en: 'Payment method',
+    },
+    'subscription_auto_renew_title': {
+      AppLanguage.ru: 'Автопродление',
+      AppLanguage.kz: 'Автоматты жаңарту',
+      AppLanguage.en: 'Auto-renew',
+    },
+    'subscription_auto_renew_on_body': {
+      AppLanguage.ru: 'Спишем {price} автоматически в конце периода',
+      AppLanguage.kz: 'Кезең соңында {price} автоматты түрде есептен шығарылады',
+      AppLanguage.en: 'We\'ll charge {price} automatically at the end of the period',
+    },
+    'subscription_auto_renew_off_body': {
+      AppLanguage.ru: 'Подписка не будет продлена автоматически',
+      AppLanguage.kz: 'Жазылым автоматты түрде жаңартылмайды',
+      AppLanguage.en: 'Your subscription will not renew automatically',
+    },
 
     // Google-вход
     'google_continue': {
