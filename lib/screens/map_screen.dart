@@ -244,11 +244,12 @@ class _MapScreenState extends State<MapScreen> {
     final points = _filtered;
     final withoutCoords = _all.where((z) => !z.hasCoordinates).length;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // CARTO теперь требует платный API-ключ для basemaps.cartocdn.com —
-    // используем бесплатные тайлы Esri (ключ не нужен).
-    final tileUrl = isDark
-        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-        : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    // Esri Canvas (light/dark gray base) — обобщённая справочная подложка,
+    // почти не обновляется для новых/неформальных районов на окраинах
+    // Алматы (там как раз много объектов из списка). Переходим на обычные
+    // тайлы OpenStreetMap — покрытие улиц там намного актуальнее
+    // (сообщество регулярно дорисовывает новые дороги).
+    const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     final topInset = MediaQuery.of(context).padding.top;
 
@@ -288,7 +289,7 @@ class _MapScreenState extends State<MapScreen> {
                     const RichAttributionWidget(
                       alignment: AttributionAlignment.bottomLeft,
                       attributions: [
-                        TextSourceAttribution('Esri'),
+                        TextSourceAttribution('OpenStreetMap contributors'),
                       ],
                     ),
                     MarkerLayer(
