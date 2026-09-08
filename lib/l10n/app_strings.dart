@@ -383,6 +383,16 @@ class AppStrings {
       AppLanguage.en: 'Signed in',
     },
     'profile_logout': {AppLanguage.ru: 'Выйти', AppLanguage.kz: 'Шығу', AppLanguage.en: 'Log out'},
+    'profile_group_account': {
+      AppLanguage.ru: 'Аккаунт',
+      AppLanguage.kz: 'Аккаунт',
+      AppLanguage.en: 'Account',
+    },
+    'profile_group_app': {
+      AppLanguage.ru: 'Приложение',
+      AppLanguage.kz: 'Қолданба',
+      AppLanguage.en: 'App',
+    },
 
     // Настройки
     'settings_title': {
