@@ -425,6 +425,31 @@ class AppStrings {
       AppLanguage.kz: 'Тіл',
       AppLanguage.en: 'Language',
     },
+    'settings_notifications_group': {
+      AppLanguage.ru: 'Уведомления',
+      AppLanguage.kz: 'Хабарландырулар',
+      AppLanguage.en: 'Notifications',
+    },
+    'settings_status_notifications_title': {
+      AppLanguage.ru: 'Изменение статуса ЖК',
+      AppLanguage.kz: 'ЖК мәртебесінің өзгеруі',
+      AppLanguage.en: 'Development status changes',
+    },
+    'settings_status_notifications_body': {
+      AppLanguage.ru: 'Сообщим, если статус избранного ЖК изменится',
+      AppLanguage.kz: 'Таңдаулы ЖК-ңыздың мәртебесі өзгерсе, хабарлаймыз',
+      AppLanguage.en: "We'll let you know if a favorited development changes status",
+    },
+    'settings_email_notifications_title': {
+      AppLanguage.ru: 'Email-уведомления',
+      AppLanguage.kz: 'Email-хабарландырулар',
+      AppLanguage.en: 'Email notifications',
+    },
+    'settings_email_notifications_body': {
+      AppLanguage.ru: 'Дублировать важные уведомления на почту',
+      AppLanguage.kz: 'Маңызды хабарландыруларды поштаға да жіберу',
+      AppLanguage.en: 'Also send important notifications by email',
+    },
 
     // Общие
     'divider_or': {AppLanguage.ru: 'или', AppLanguage.kz: 'немесе', AppLanguage.en: 'or'},

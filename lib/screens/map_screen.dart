@@ -10,6 +10,7 @@ import '../models/zhk.dart';
 import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
 import '../services/profile_service.dart';
+import '../services/settings_service.dart';
 import '../services/zhk_repository.dart';
 import '../widgets/zhk_preview_sheet.dart';
 import 'admin_zhk_edit_screen.dart';
@@ -100,6 +101,10 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _refreshUnseenNotifications() async {
     if (!context.read<AuthService>().isLoggedIn) return;
+    if (!context.read<SettingsService>().statusNotifications) {
+      setState(() => _unseenNotifications = 0);
+      return;
+    }
     final count = await NotificationsScreen.unseenCount(context.read<FavoritesService>());
     if (!mounted) return;
     setState(() => _unseenNotifications = count);
