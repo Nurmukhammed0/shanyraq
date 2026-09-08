@@ -1047,6 +1047,23 @@ class AppStrings {
       AppLanguage.kz: 'Саясат жаңартылуы мүмкін. Маңызды өзгерістер туралы қолданбада хабарлаймыз.',
       AppLanguage.en: 'This policy may change. We\'ll notify you in-app about important updates.',
     },
+
+    // Блокировка аккаунта
+    'blocked_title': {
+      AppLanguage.ru: 'Доступ ограничен',
+      AppLanguage.kz: 'Қолжетімділік шектелген',
+      AppLanguage.en: 'Access restricted',
+    },
+    'blocked_body': {
+      AppLanguage.ru: 'Ваш аккаунт заблокирован администратором. Если это ошибка, напишите на shanyraqsend@gmail.com.',
+      AppLanguage.kz: 'Аккаунтыңыз әкімші тарапынан бұғатталған. Бұл қате болса, shanyraqsend@gmail.com мекенжайына жазыңыз.',
+      AppLanguage.en: 'Your account has been blocked by an administrator. If this is a mistake, contact shanyraqsend@gmail.com.',
+    },
+    'blocked_sign_out': {
+      AppLanguage.ru: 'Выйти',
+      AppLanguage.kz: 'Шығу',
+      AppLanguage.en: 'Sign out',
+    },
   };
 }
 

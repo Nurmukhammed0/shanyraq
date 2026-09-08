@@ -21,6 +21,7 @@ class ProfileService extends ChangeNotifier {
 
   bool get isAdmin => _profile?['role'] == 'admin';
   bool get isSubscribed => _profile?['is_subscribed'] == true;
+  bool get isBlocked => _profile?['blocked'] == true;
   bool get autoRenew => _profile?['auto_renew'] as bool? ?? true;
   String? get email => _profile?['email'] as String?;
   String? get displayName => _profile?['display_name'] as String?;

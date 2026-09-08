@@ -110,6 +110,156 @@ class _UsersScreenState extends State<_UsersScreen> {
     _load();
   }
 
+  Future<void> _setBlocked(String userId, bool value) async {
+    try {
+      await _client.rpc('admin_set_blocked', params: {'target_id': userId, 'blocked_value': value});
+      _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      }
+    }
+  }
+
+  Future<void> _deleteUser(String userId, String email) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Удалить пользователя?'),
+        content: Text('«$email» будет удалён безвозвратно вместе со всеми его данными. Это необратимо.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE24B4A)),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _client.rpc('admin_delete_user', params: {'target_id': userId});
+      _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка удаления: $e')));
+      }
+    }
+  }
+
+  Future<void> _openAddUserDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final nameController = TextEditingController();
+    bool asAdmin = false;
+    bool subscribed = false;
+    bool submitting = false;
+    String? error;
+
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          Future<void> submit() async {
+            final email = emailController.text.trim();
+            final password = passwordController.text;
+            if (email.isEmpty || password.length < 8) {
+              setSheetState(() => error = 'Укажите email и пароль (минимум 8 символов)');
+              return;
+            }
+            setSheetState(() {
+              submitting = true;
+              error = null;
+            });
+            try {
+              final res = await _client.functions.invoke('admin-create-user', body: {
+                'email': email,
+                'password': password,
+                'displayName': nameController.text.trim().isEmpty ? null : nameController.text.trim(),
+                'role': asAdmin ? 'admin' : 'user',
+                'isSubscribed': subscribed,
+              });
+              final data = res.data;
+              if (data is Map && data['error'] != null) {
+                setSheetState(() {
+                  submitting = false;
+                  error = data['error'] as String;
+                });
+                return;
+              }
+              if (ctx.mounted) Navigator.pop(ctx, true);
+            } catch (e) {
+              setSheetState(() {
+                submitting = false;
+                error = 'Не удалось создать: $e';
+              });
+            }
+          }
+
+          return AlertDialog(
+            title: const Text('Новый пользователь'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(labelText: 'Email'),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Пароль (мин. 8 символов)'),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(labelText: 'Имя (необязательно)'),
+                  ),
+                  const SizedBox(height: 6),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Подписка сразу активна'),
+                    value: subscribed,
+                    onChanged: (v) => setSheetState(() => subscribed = v),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Роль администратора'),
+                    value: asAdmin,
+                    onChanged: (v) => setSheetState(() => asAdmin = v),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(error!, style: const TextStyle(color: Color(0xFFE24B4A), fontSize: 13)),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: submitting ? null : () => Navigator.pop(ctx, false),
+                child: const Text('Отмена'),
+              ),
+              FilledButton(
+                onPressed: submitting ? null : submit,
+                child: submitting
+                    ? const SizedBox(
+                        width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('Создать'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    if (created == true) _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -131,54 +281,92 @@ class _UsersScreenState extends State<_UsersScreen> {
                       final role = p['role'] as String? ?? 'user';
                       final isSubscribed = p['is_subscribed'] == true;
                       final isAdmin = role == 'admin';
+                      final isBlocked = p['blocked'] == true;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
+                          color: isBlocked
+                              ? const Color(0xFFE24B4A).withOpacity(0.08)
+                              : colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(14),
+                          border: isBlocked
+                              ? Border.all(color: const Color(0xFFE24B4A).withOpacity(0.4))
+                              : null,
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CircleAvatar(
-                              radius: 18,
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Icon(Icons.person, size: 18, color: colorScheme.onPrimaryContainer),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(email,
-                                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
-                                      overflow: TextOverflow.ellipsis),
-                                  Text(isAdmin ? 'admin' : 'user',
-                                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant)),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
+                            Row(
                               children: [
-                                Text('Подписка', style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
-                                Switch(
-                                  value: isSubscribed,
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  onChanged: (v) => _setSubscribed(id, v),
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: colorScheme.primaryContainer,
+                                  child: Icon(Icons.person, size: 18, color: colorScheme.onPrimaryContainer),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(email,
+                                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                                          overflow: TextOverflow.ellipsis),
+                                      Text(
+                                        isBlocked ? 'заблокирован' : (isAdmin ? 'admin' : 'user'),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isBlocked ? const Color(0xFFE24B4A) : colorScheme.onSurfaceVariant,
+                                          fontWeight: isBlocked ? FontWeight.w600 : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Подписка',
+                                        style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                                    Switch(
+                                      value: isSubscribed,
+                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (v) => _setSubscribed(id, v),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 6),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Admin', style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                                    Switch(
+                                      value: isAdmin,
+                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (v) => _setRole(id, v ? 'admin' : 'user'),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 6),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
+                            const Divider(height: 18),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text('Admin', style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
-                                Switch(
-                                  value: isAdmin,
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  onChanged: (v) => _setRole(id, v ? 'admin' : 'user'),
+                                TextButton.icon(
+                                  onPressed: () => _setBlocked(id, !isBlocked),
+                                  icon: Icon(isBlocked ? Icons.lock_open : Icons.block, size: 16),
+                                  label: Text(isBlocked ? 'Разблокировать' : 'Заблокировать'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: isBlocked ? const Color(0xFF22C55E) : Colors.orange.shade800,
+                                  ),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => _deleteUser(id, email),
+                                  icon: const Icon(Icons.delete_outline, size: 16),
+                                  label: const Text('Удалить'),
+                                  style: TextButton.styleFrom(foregroundColor: const Color(0xFFE24B4A)),
                                 ),
                               ],
                             ),
@@ -188,6 +376,11 @@ class _UsersScreenState extends State<_UsersScreen> {
                     },
                   ),
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddUserDialog,
+        tooltip: 'Добавить пользователя',
+        child: const Icon(Icons.person_add_alt_1),
+      ),
     );
   }
 }
