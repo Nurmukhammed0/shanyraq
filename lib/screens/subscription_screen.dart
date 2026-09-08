@@ -6,7 +6,7 @@ import '../services/profile_service.dart';
 import '../widgets/app_logo.dart';
 
 const _supportPhone = '+7 771 470 72 22';
-const _supportEmail = 'nurbeekovn@gmail.com';
+const _supportEmail = 'shanyraqsend@gmail.com';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});

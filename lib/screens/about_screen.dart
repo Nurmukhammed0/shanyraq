@@ -6,7 +6,7 @@ import 'privacy_policy_screen.dart';
 import 'terms_screen.dart';
 
 const _supportPhone = '+7 771 470 72 22';
-const _supportEmail = 'nurbeekovn@gmail.com';
+const _supportEmail = 'shanyraqsend@gmail.com';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
+import '../widgets/grouped_list.dart';
 import 'about_screen.dart';
 import 'admin_screen.dart';
 import 'edit_profile_screen.dart';
@@ -143,16 +144,16 @@ class _ProfileView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _GroupLabel(context.tr('profile_group_account')),
-          _GroupCard(children: [
-            _MenuRow(
+          GroupLabel(context.tr('profile_group_account')),
+          GroupCard(children: [
+            MenuRow(
               icon: Icons.edit_outlined,
               title: context.tr('edit_profile_title'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const EditProfileScreen()),
               ),
             ),
-            _MenuRow(
+            MenuRow(
               icon: Icons.workspace_premium_outlined,
               title: context.tr('profile_subscription_tile'),
               trailing: subscribed
@@ -164,9 +165,9 @@ class _ProfileView extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 20),
-          _GroupLabel(context.tr('profile_group_app')),
-          _GroupCard(children: [
-            _MenuRow(
+          GroupLabel(context.tr('profile_group_app')),
+          GroupCard(children: [
+            MenuRow(
               icon: Icons.settings_outlined,
               title: context.tr('profile_settings_tile'),
               onTap: () => Navigator.of(context).push(
@@ -174,14 +175,14 @@ class _ProfileView extends StatelessWidget {
               ),
             ),
             if (profile.isAdmin)
-              _MenuRow(
+              MenuRow(
                 icon: Icons.admin_panel_settings_outlined,
                 title: context.tr('profile_admin_tile'),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const AdminScreen()),
                 ),
               ),
-            _MenuRow(
+            MenuRow(
               icon: Icons.info_outline,
               title: context.tr('about_title'),
               onTap: () => Navigator.of(context).push(
@@ -209,93 +210,3 @@ class _ProfileView extends StatelessWidget {
   }
 }
 
-class _GroupLabel extends StatelessWidget {
-  final String text;
-  const _GroupLabel(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12.5,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ),
-    );
-  }
-}
-
-class _GroupCard extends StatelessWidget {
-  final List<Widget> children;
-  const _GroupCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            children[i],
-            if (i != children.length - 1)
-              Divider(height: 1, indent: 60, color: colorScheme.outlineVariant.withOpacity(0.4)),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _MenuRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-  final Widget? trailing;
-
-  const _MenuRow({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Icon(icon, size: 17, color: colorScheme.primary),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14.5)),
-            ),
-            if (trailing != null) ...[trailing!, const SizedBox(width: 8)],
-            Icon(Icons.chevron_right, size: 20, color: colorScheme.onSurfaceVariant.withOpacity(0.5)),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -733,6 +733,61 @@ class AppStrings {
       AppLanguage.kz: 'Құпия сөзді өзгерту',
       AppLanguage.en: 'Change password',
     },
+    'profile_edit_name_row': {
+      AppLanguage.ru: 'Изменить имя',
+      AppLanguage.kz: 'Атын өзгерту',
+      AppLanguage.en: 'Change name',
+    },
+    'profile_change_password_row': {
+      AppLanguage.ru: 'Изменить пароль',
+      AppLanguage.kz: 'Құпия сөзді өзгерту',
+      AppLanguage.en: 'Change password',
+    },
+    'change_password_old_label': {
+      AppLanguage.ru: 'Текущий пароль',
+      AppLanguage.kz: 'Ағымдағы құпия сөз',
+      AppLanguage.en: 'Current password',
+    },
+    'change_password_continue_button': {
+      AppLanguage.ru: 'Продолжить',
+      AppLanguage.kz: 'Жалғастыру',
+      AppLanguage.en: 'Continue',
+    },
+    'change_password_wrong_old': {
+      AppLanguage.ru: 'Неверный пароль',
+      AppLanguage.kz: 'Құпия сөз дұрыс емес',
+      AppLanguage.en: 'Incorrect password',
+    },
+    'change_password_verified': {
+      AppLanguage.ru: 'Пароль верный',
+      AppLanguage.kz: 'Құпия сөз дұрыс',
+      AppLanguage.en: 'Password correct',
+    },
+    'change_password_new_label': {
+      AppLanguage.ru: 'Новый пароль',
+      AppLanguage.kz: 'Жаңа құпия сөз',
+      AppLanguage.en: 'New password',
+    },
+    'change_password_confirm_label': {
+      AppLanguage.ru: 'Повторите новый пароль',
+      AppLanguage.kz: 'Жаңа құпия сөзді қайталаңыз',
+      AppLanguage.en: 'Confirm new password',
+    },
+    'change_password_mismatch': {
+      AppLanguage.ru: 'Пароли не совпадают',
+      AppLanguage.kz: 'Құпия сөздер сәйкес келмейді',
+      AppLanguage.en: 'Passwords don\'t match',
+    },
+    'change_password_match': {
+      AppLanguage.ru: 'Пароли совпадают',
+      AppLanguage.kz: 'Құпия сөздер сәйкес келеді',
+      AppLanguage.en: 'Passwords match',
+    },
+    'change_password_save_button': {
+      AppLanguage.ru: 'Сохранить новый пароль',
+      AppLanguage.kz: 'Жаңа құпия сөзді сақтау',
+      AppLanguage.en: 'Save new password',
+    },
     'profile_danger_zone_title': {
       AppLanguage.ru: 'Опасная зона',
       AppLanguage.kz: 'Қауіпті аймақ',
@@ -830,9 +885,9 @@ class AppStrings {
       AppLanguage.en: '1. About the app',
     },
     'terms_s1_body': {
-      AppLanguage.ru: 'Приложение «Шаңырақ» предоставляет справочную информацию о статусе жилых комплексов Алматы на основе открытых официальных отчётов. Информация носит справочный характер и не является юридической консультацией или гарантией.',
-      AppLanguage.kz: '«Шаңырақ» қолданбасы ашық ресми есептер негізінде Алматы тұрғын үй кешендерінің мәртебесі туралы анықтамалық ақпарат береді. Ақпарат анықтамалық сипатта және заңды кеңес немесе кепілдік болып табылмайды.',
-      AppLanguage.en: 'The Shanyraq app provides reference information about the status of Almaty residential complexes based on public official reports. The information is for reference only and does not constitute legal advice or a guarantee.',
+      AppLanguage.ru: 'Шаңырақ даёт справочную информацию по ЖК Алматы на основе открытых отчётов. Это не юридическая консультация и не гарантия.',
+      AppLanguage.kz: 'Шаңырақ ашық есептер негізінде Алматы ЖК-лары бойынша анықтамалық ақпарат береді. Бұл заңды кеңес немесе кепілдік емес.',
+      AppLanguage.en: 'Shanyraq gives reference info on Almaty developments based on public reports. It is not legal advice or a guarantee.',
     },
     'terms_s2_title': {
       AppLanguage.ru: '2. Точность данных',
@@ -840,15 +895,15 @@ class AppStrings {
       AppLanguage.en: '2. Data accuracy',
     },
     'terms_s2_body': {
-      AppLanguage.ru: 'Мы стараемся поддерживать данные актуальными, но не гарантируем их полноту и абсолютную точность на момент просмотра. Перед принятием решения о покупке недвижимости рекомендуем проверить информацию самостоятельно в официальных источниках.',
-      AppLanguage.kz: 'Деректерді өзекті ұстауға тырысамыз, бірақ қарау сәтіндегі толықтығына және абсолютті дәлдігіне кепілдік бермейміз. Жылжымайтын мүлік сатып алу туралы шешім қабылдамас бұрын ақпаратты ресми көздерден өз бетіңізше тексеруді ұсынамыз.',
-      AppLanguage.en: 'We try to keep the data up to date, but we do not guarantee its completeness or absolute accuracy at the time of viewing. Before deciding to buy property, we recommend verifying the information yourself in official sources.',
+      AppLanguage.ru: 'Данные могут быть неполными или устаревшими. Перед покупкой проверяйте важные детали в официальных источниках.',
+      AppLanguage.kz: 'Деректер толық емес немесе ескірген болуы мүмкін. Сатып алу алдында маңызды мәліметтерді ресми көздерден тексеріңіз.',
+      AppLanguage.en: 'Data may be incomplete or outdated. Verify important details in official sources before buying.',
     },
     'terms_s3_title': {AppLanguage.ru: '3. Подписка', AppLanguage.kz: '3. Жазылым', AppLanguage.en: '3. Subscription'},
     'terms_s3_body': {
-      AppLanguage.ru: 'Часть информации (детали по объекту) доступна по платной подписке. Условия оплаты и активации подписки могут уточняться индивидуально до запуска автоматического платежа в приложении.',
-      AppLanguage.kz: 'Ақпараттың бір бөлігі (нысан бойынша мәліметтер) ақылы жазылым арқылы қолжетімді. Төлем және жазылымды белсендіру шарттары қолданбада автоматты төлем іске қосылғанға дейін жеке нақтылануы мүмкін.',
-      AppLanguage.en: 'Some information (development details) is available via a paid subscription. Payment and activation terms may be clarified individually until automatic in-app payment is launched.',
+      AppLanguage.ru: 'Детали по объекту — платно, по подписке. Она продлевается автоматически, отменить можно в любой момент в разделе «Подписка».',
+      AppLanguage.kz: 'Нысан бойынша мәліметтер — ақылы, жазылым арқылы. Ол автоматты жаңартылады, кез келген уақытта «Жазылым» бөлімінде тоқтата аласыз.',
+      AppLanguage.en: 'Development details are paid, via subscription. It renews automatically; cancel anytime in the Subscription section.',
     },
     'terms_s4_title': {
       AppLanguage.ru: '4. Ответственность',
@@ -856,9 +911,9 @@ class AppStrings {
       AppLanguage.en: '4. Liability',
     },
     'terms_s4_body': {
-      AppLanguage.ru: 'Приложение не несёт ответственности за решения, принятые на основе предоставленной информации. Используя приложение, вы соглашаетесь, что окончательную проверку любых сведений о застройщике и объекте вы проводите самостоятельно.',
-      AppLanguage.kz: 'Қолданба берілген ақпарат негізінде қабылданған шешімдер үшін жауапты болмайды. Қолданбаны пайдалана отырып, сіз құрылысшы мен нысан туралы кез келген мәліметтің соңғы тексерісін өз бетіңізше жүргізетініңізге келісесіз.',
-      AppLanguage.en: 'The app is not responsible for decisions made based on the information provided. By using the app, you agree that you perform the final verification of any information about the developer and the property yourself.',
+      AppLanguage.ru: 'Мы не отвечаем за решения, принятые на основе наших данных. Финальную проверку застройщика и объекта вы делаете сами.',
+      AppLanguage.kz: 'Біздің деректер негізінде қабылданған шешімдерге жауап бермейміз. Құрылысшы мен нысанды соңғы тексеруді өзіңіз жасайсыз.',
+      AppLanguage.en: 'We are not liable for decisions based on our data. You are responsible for the final check of the developer and the property.',
     },
     'terms_s5_title': {
       AppLanguage.ru: '5. Изменения соглашения',
@@ -866,9 +921,9 @@ class AppStrings {
       AppLanguage.en: '5. Changes to the agreement',
     },
     'terms_s5_body': {
-      AppLanguage.ru: 'Мы можем обновлять условия использования. Продолжая пользоваться приложением после обновления, вы соглашаетесь с новой редакцией.',
-      AppLanguage.kz: 'Біз пайдалану шарттарын жаңарта аламыз. Жаңартудан кейін қолданбаны пайдалануды жалғастыра отырып, сіз жаңа редакциямен келісесіз.',
-      AppLanguage.en: 'We may update the terms of use. By continuing to use the app after an update, you agree to the new version.',
+      AppLanguage.ru: 'Условия могут меняться. Продолжая пользоваться приложением, вы принимаете новую версию.',
+      AppLanguage.kz: 'Шарттар өзгеруі мүмкін. Қолданбаны пайдалануды жалғастырып, жаңа нұсқаны қабылдайсыз.',
+      AppLanguage.en: 'Terms may change. Continuing to use the app means you accept the new version.',
     },
 
     // Политика конфиденциальности
@@ -878,9 +933,9 @@ class AppStrings {
       AppLanguage.en: '1. What data we collect',
     },
     'privacy_s1_body': {
-      AppLanguage.ru: 'При регистрации мы сохраняем ваш email и пароль (в зашифрованном виде, через Supabase Auth). При использовании приложения мы сохраняем список ЖК, добавленных вами в избранное, и статус подписки. Мы не собираем геолокацию без вашего явного разрешения — она используется только локально для отображения вашего положения на карте и никуда не отправляется.',
-      AppLanguage.kz: 'Тіркелу кезінде біз сіздің email мен құпия сөзіңізді сақтаймыз (Supabase Auth арқылы шифрланған түрде). Қолданбаны пайдалану кезінде біз сіз таңдаулыға қосқан ЖК тізімін және жазылым мәртебесін сақтаймыз. Сіздің тікелей рұқсатыңызсыз геолокацияны жинамаймыз — ол тек картада орналасуыңызды көрсету үшін жергілікті түрде пайдаланылады және ешқайда жіберілмейді.',
-      AppLanguage.en: 'When you register, we store your email and password (encrypted, via Supabase Auth). While using the app, we store the list of developments you\'ve favorited and your subscription status. We do not collect location without your explicit permission — it is used only locally to show your position on the map and is never sent anywhere.',
+      AppLanguage.ru: 'Email, пароль (зашифрован), избранное и статус подписки. Геолокацию используем только локально, с вашего разрешения — никуда не отправляем.',
+      AppLanguage.kz: 'Email, құпия сөз (шифрланған), таңдаулылар және жазылым мәртебесі. Геолокацияны тек жергілікті түрде, рұқсатыңызбен қолданамыз — ешқайда жібермейміз.',
+      AppLanguage.en: 'Email, password (encrypted), favorites, and subscription status. Location is used only locally, with your permission — never sent anywhere.',
     },
     'privacy_s2_title': {
       AppLanguage.ru: '2. Как мы используем данные',
@@ -888,9 +943,9 @@ class AppStrings {
       AppLanguage.en: '2. How we use data',
     },
     'privacy_s2_body': {
-      AppLanguage.ru: 'Email используется для входа в аккаунт и связи с вами по вопросам подписки. Список избранного хранится, чтобы вы могли вернуться к нему позже. Мы не продаём и не передаём ваши данные третьим лицам.',
-      AppLanguage.kz: 'Email аккаунтқа кіру және жазылым мәселелері бойынша сізбен байланысу үшін пайдаланылады. Таңдаулылар тізімі кейін оралу үшін сақталады. Біз сіздің деректеріңізді сатпаймыз және үшінші тұлғаларға бермейміз.',
-      AppLanguage.en: 'Email is used to sign in and to contact you about subscription matters. The favorites list is stored so you can come back to it later. We do not sell or share your data with third parties.',
+      AppLanguage.ru: 'Только для входа, работы избранного и вопросов по подписке. Не продаём и не передаём данные третьим лицам.',
+      AppLanguage.kz: 'Тек кіру, таңдаулылар және жазылым мәселелері үшін. Деректерді сатпаймыз және үшінші тұлғаларға бермейміз.',
+      AppLanguage.en: 'Only for sign-in, favorites, and subscription matters. We never sell or share your data with third parties.',
     },
     'privacy_s3_title': {
       AppLanguage.ru: '3. Хранение данных',
@@ -898,9 +953,9 @@ class AppStrings {
       AppLanguage.en: '3. Data storage',
     },
     'privacy_s3_body': {
-      AppLanguage.ru: 'Данные хранятся на серверах Supabase. Вы можете удалить аккаунт и все связанные данные в любой момент через Профиль → Редактировать профиль → Удалить аккаунт.',
-      AppLanguage.kz: 'Деректер Supabase серверлерінде сақталады. Сіз кез келген уақытта Профиль → Профильді өңдеу → Аккаунтты жою арқылы аккаунтты және онымен байланысты барлық деректерді жоя аласыз.',
-      AppLanguage.en: 'Data is stored on Supabase servers. You can delete your account and all related data at any time via Profile → Edit profile → Delete account.',
+      AppLanguage.ru: 'Храним на серверах Supabase. Удалить аккаунт и все данные можно в любой момент: Профиль → Редактировать профиль → Удалить аккаунт.',
+      AppLanguage.kz: 'Supabase серверлерінде сақтаймыз. Аккаунтты және барлық деректерді кез келген уақытта жоя аласыз: Профиль → Профильді өңдеу → Аккаунтты жою.',
+      AppLanguage.en: 'Stored on Supabase servers. Delete your account and all data anytime: Profile → Edit profile → Delete account.',
     },
     'privacy_s4_title': {
       AppLanguage.ru: '4. Ваши права',
@@ -908,9 +963,9 @@ class AppStrings {
       AppLanguage.en: '4. Your rights',
     },
     'privacy_s4_body': {
-      AppLanguage.ru: 'Вы можете запросить копию своих данных, исправить их или удалить аккаунт полностью в любое время. Для вопросов пишите на nurbeekovn@gmail.com.',
-      AppLanguage.kz: 'Сіз кез келген уақытта өз деректеріңіздің көшірмесін сұрата аласыз, оларды түзете аласыз немесе аккаунтты толығымен жоя аласыз. Сұрақтар бойынша nurbeekovn@gmail.com мекенжайына жазыңыз.',
-      AppLanguage.en: 'You can request a copy of your data, correct it, or delete your account entirely at any time. For questions, write to nurbeekovn@gmail.com.',
+      AppLanguage.ru: 'Можете запросить, исправить или удалить свои данные в любой момент. Вопросы — на shanyraqsend@gmail.com.',
+      AppLanguage.kz: 'Деректеріңізді кез келген уақытта сұрата, түзете немесе жоя аласыз. Сұрақтар — shanyraqsend@gmail.com.',
+      AppLanguage.en: 'You can request, correct, or delete your data anytime. Questions — shanyraqsend@gmail.com.',
     },
     'privacy_s5_title': {
       AppLanguage.ru: '5. Изменения политики',
@@ -918,9 +973,9 @@ class AppStrings {
       AppLanguage.en: '5. Changes to this policy',
     },
     'privacy_s5_body': {
-      AppLanguage.ru: 'Мы можем обновлять эту политику. О существенных изменениях сообщим внутри приложения.',
-      AppLanguage.kz: 'Біз бұл саясатты жаңарта аламыз. Елеулі өзгерістер туралы қолданба ішінде хабарлаймыз.',
-      AppLanguage.en: 'We may update this policy. We will notify you of significant changes inside the app.',
+      AppLanguage.ru: 'Политика может обновляться. О важных изменениях сообщим в приложении.',
+      AppLanguage.kz: 'Саясат жаңартылуы мүмкін. Маңызды өзгерістер туралы қолданбада хабарлаймыз.',
+      AppLanguage.en: 'This policy may change. We\'ll notify you in-app about important updates.',
     },
   };
 }
