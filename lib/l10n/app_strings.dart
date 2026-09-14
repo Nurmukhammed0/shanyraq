@@ -22,6 +22,7 @@ class AppStrings {
 
   static const Map<String, Map<AppLanguage, String>> _dict = {
     // Навигация
+    'nav_home': {AppLanguage.ru: 'Главная', AppLanguage.kz: 'Басты бет', AppLanguage.en: 'Home'},
     'nav_map': {AppLanguage.ru: 'Карта', AppLanguage.kz: 'Карта', AppLanguage.en: 'Map'},
     'nav_favorites': {
       AppLanguage.ru: 'Избранное',
@@ -107,6 +108,56 @@ class AppStrings {
       AppLanguage.ru: 'Поиск по названию или адресу',
       AppLanguage.kz: 'Атауы немесе мекенжайы бойынша іздеу',
       AppLanguage.en: 'Search by name or address',
+    },
+
+    // Главная
+    'home_documents_title': {
+      AppLanguage.ru: 'Документы новостроек',
+      AppLanguage.kz: 'Жаңа құрылыс құжаттары',
+      AppLanguage.en: 'New building documents',
+    },
+    'home_documents_subtitle': {
+      AppLanguage.ru: 'Статусы ЖК, документы и карта',
+      AppLanguage.kz: 'ЖК мәртебелері, құжаттар және карта',
+      AppLanguage.en: 'Complex statuses, documents and map',
+    },
+    'home_buy_title': {
+      AppLanguage.ru: 'Купить дом',
+      AppLanguage.kz: 'Үй сатып алу',
+      AppLanguage.en: 'Buy a home',
+    },
+    'home_buy_subtitle': {
+      AppLanguage.ru: 'Подбор и оформление жилья',
+      AppLanguage.kz: 'Тұрғын үй таңдау және рәсімдеу',
+      AppLanguage.en: 'Home search and purchase',
+    },
+    'home_buy_badge': {
+      AppLanguage.ru: 'Проект готовится',
+      AppLanguage.kz: 'Жоба дайындалуда',
+      AppLanguage.en: 'Coming soon',
+    },
+    'buy_house_coming_body': {
+      AppLanguage.ru: 'Мы работаем над разделом покупки жилья. Скоро здесь появится '
+          'подбор и оформление ЖК.',
+      AppLanguage.kz: 'Біз тұрғын үй сатып алу бөлімін дайындап жатырмыз. Жақында '
+          'мұнда ЖК таңдау және рәсімдеу пайда болады.',
+      AppLanguage.en: 'We\'re working on the home-buying section. Complex search '
+          'and purchase are coming here soon.',
+    },
+    'zhk_list_empty_title': {
+      AppLanguage.ru: 'Ничего не найдено',
+      AppLanguage.kz: 'Ештеңе табылмады',
+      AppLanguage.en: 'Nothing found',
+    },
+    'zhk_list_empty_body': {
+      AppLanguage.ru: 'Попробуйте изменить фильтры или запрос поиска.',
+      AppLanguage.kz: 'Сүзгілерді немесе іздеу сұрауын өзгертіп көріңіз.',
+      AppLanguage.en: 'Try adjusting the filters or your search.',
+    },
+    'zhk_list_city_almaty': {
+      AppLanguage.ru: 'Алматы',
+      AppLanguage.kz: 'Алматы',
+      AppLanguage.en: 'Almaty',
     },
 
     // Избранное

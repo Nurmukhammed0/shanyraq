@@ -24,7 +24,13 @@ enum ZhkFilter { all, problematic, completedGuaranteed }
 const _almatyCenter = LatLng(43.2220, 76.8512);
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  // Заданы, когда карту открывают из списка ЖК с уже выбранными
+  // фильтрами (например, «Алматы + только проблемные»). По умолчанию
+  // (обычный вход в карту) — null, поведение не меняется.
+  final ZhkFilter? initialFilter;
+  final String? initialDistrict;
+
+  const MapScreen({super.key, this.initialFilter, this.initialDistrict});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -48,6 +54,8 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _filter = widget.initialFilter ?? ZhkFilter.all;
+    _districtFilter = widget.initialDistrict;
     _load();
     _refreshUnseenNotifications();
     _subscribeToRealtime();
@@ -369,6 +377,19 @@ class _MapScreenState extends State<MapScreen> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (Navigator.of(context).canPop()) ...[
+                            Material(
+                              elevation: 3,
+                              shadowColor: Colors.black26,
+                              shape: const CircleBorder(),
+                              clipBehavior: Clip.antiAlias,
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           Expanded(
                             child: Material(
                               elevation: 3,

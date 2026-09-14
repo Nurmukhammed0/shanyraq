@@ -9,12 +9,12 @@ import 'about_screen.dart';
 import 'admin_screen.dart';
 import 'edit_profile_screen.dart';
 import 'favorites_screen.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
-import 'map_screen.dart';
 import 'settings_screen.dart';
 import 'subscription_screen.dart';
 
-/// Корневой экран с нижней навигацией: Карта / Избранное / Профиль.
+/// Корневой экран с нижней навигацией: Главная / Избранное / Профиль.
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
 
@@ -30,7 +30,7 @@ class _RootShellState extends State<RootShell> {
     final auth = context.watch<AuthService>();
 
     final tabs = [
-      const MapScreen(),
+      const HomeScreen(),
       const FavoritesScreen(),
       auth.isLoggedIn ? const _ProfileView() : const LoginScreen(),
     ];
@@ -42,9 +42,9 @@ class _RootShellState extends State<RootShell> {
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.map_outlined),
-            selectedIcon: const Icon(Icons.map),
-            label: context.tr('nav_map'),
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: context.tr('nav_home'),
           ),
           NavigationDestination(
             icon: const Icon(Icons.favorite_border),
