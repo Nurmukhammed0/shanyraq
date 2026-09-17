@@ -87,16 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(context.tr('home_catalog_title'),
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16.5)),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 192,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _catalogPreview.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, i) => _ZhkPreviewCard(zhk: _catalogPreview[i]),
+            for (final z in _catalogPreview)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _ZhkPreviewCard(zhk: z),
               ),
-            ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 4),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -343,7 +339,7 @@ class _HomeActionCard extends StatelessWidget {
   }
 }
 
-/// Карточка ЖК в горизонтальной карусели каталога на главной.
+/// Строка ЖК в вертикальном превью-каталоге на главной.
 class _ZhkPreviewCard extends StatelessWidget {
   final Zhk zhk;
   const _ZhkPreviewCard({required this.zhk});
@@ -353,23 +349,27 @@ class _ZhkPreviewCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final profile = context.watch<ProfileService>();
     final statusColor = zhk.isProblematic ? const Color(0xFFE24B4A) : const Color(0xFF22C55E);
+    final description = [zhk.district, zhk.address].whereType<String>().join(' · ');
 
-    return SizedBox(
-      width: 148,
-      child: Material(
-        color: colorScheme.surfaceVariant,
-        borderRadius: BorderRadius.circular(16),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ZhkDetailScreen(zhk: zhk)),
-          ),
-          child: Column(
+    return Material(
+      color: colorScheme.surfaceVariant,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => ZhkDetailScreen(zhk: zhk)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ZhkPhotoThumbnail(photoUrl: zhk.photoUrl, width: 148, height: 96),
-              Padding(
-                padding: const EdgeInsets.all(10),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: ZhkPhotoThumbnail(photoUrl: zhk.photoUrl, width: 68, height: 68),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -377,8 +377,17 @@ class _ZhkPreviewCard extends StatelessWidget {
                       zhk.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14.5),
                     ),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      ),
+                    ],
                     const SizedBox(height: 6),
                     profile.isSubscribed
                         ? Container(
@@ -391,7 +400,7 @@ class _ZhkPreviewCard extends StatelessWidget {
                               zhk.isProblematic
                                   ? context.tr('status_red_zone_short')
                                   : context.tr('status_guaranteed_short'),
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: statusColor),
+                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: statusColor),
                             ),
                           )
                         : Row(
@@ -400,12 +409,14 @@ class _ZhkPreviewCard extends StatelessWidget {
                               Icon(Icons.lock_outline, size: 11, color: colorScheme.onSurfaceVariant),
                               const SizedBox(width: 3),
                               Text(context.tr('status_locked_short'),
-                                  style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                                  style: TextStyle(fontSize: 10.5, color: colorScheme.onSurfaceVariant)),
                             ],
                           ),
                   ],
                 ),
               ),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right, size: 20, color: colorScheme.onSurfaceVariant),
             ],
           ),
         ),
