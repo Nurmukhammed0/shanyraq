@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/zhk.dart';
+import '../services/profile_service.dart';
 import '../services/zhk_repository.dart';
+import '../widgets/zhk_photo_thumbnail.dart';
 import 'about_screen.dart';
 import 'buy_house_screen.dart';
+import 'zhk_detail_screen.dart';
 import 'zhk_list_screen.dart';
 
 /// Главная страница: рекламный баннер о проекте (пока единственный
@@ -18,22 +23,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int? _zhkCount;
+  List<Zhk> _all = [];
 
   @override
   void initState() {
     super.initState();
-    _loadCount();
+    _load();
   }
 
-  Future<void> _loadCount() async {
+  Future<void> _load() async {
     try {
       final data = await ZhkRepository().fetchFromSupabase();
       if (!mounted) return;
-      setState(() => _zhkCount = data.length);
+      setState(() => _all = data);
     } catch (_) {
-      // Декоративная статистика в баннере — при ошибке молча пропускаем.
+      // Каталог и статистика в баннере — декоративные, при ошибке молча пропускаем.
     }
+  }
+
+  // Чередуем проблемные/гарантийные объекты, чтобы превью на главной
+  // показывало разные ЖК, а не только один статус подряд.
+  List<Zhk> get _catalogPreview {
+    final problematic = _all.where((z) => z.isProblematic).toList();
+    final guaranteed = _all.where((z) => !z.isProblematic).toList();
+    final preview = <Zhk>[];
+    var pi = 0, gi = 0;
+    while (preview.length < 7 && (pi < problematic.length || gi < guaranteed.length)) {
+      if (pi < problematic.length) preview.add(problematic[pi++]);
+      if (preview.length < 7 && gi < guaranteed.length) preview.add(guaranteed[gi++]);
+    }
+    return preview;
   }
 
   @override
@@ -62,7 +81,34 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 22),
-          _AdBanner(zhkCount: _zhkCount),
+          _AdBanner(zhkCount: _all.isEmpty ? null : _all.length),
+          if (_catalogPreview.isNotEmpty) ...[
+            const SizedBox(height: 28),
+            Text(context.tr('home_catalog_title'),
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16.5)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 192,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _catalogPreview.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, i) => _ZhkPreviewCard(zhk: _catalogPreview[i]),
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ZhkListScreen()),
+                ),
+                icon: const Icon(Icons.grid_view_rounded, size: 18),
+                label: Text(context.tr('home_catalog_more')),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -289,6 +335,77 @@ class _HomeActionCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Карточка ЖК в горизонтальной карусели каталога на главной.
+class _ZhkPreviewCard extends StatelessWidget {
+  final Zhk zhk;
+  const _ZhkPreviewCard({required this.zhk});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final profile = context.watch<ProfileService>();
+    final statusColor = zhk.isProblematic ? const Color(0xFFE24B4A) : const Color(0xFF22C55E);
+
+    return SizedBox(
+      width: 148,
+      child: Material(
+        color: colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => ZhkDetailScreen(zhk: zhk)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ZhkPhotoThumbnail(photoUrl: zhk.photoUrl, width: 148, height: 96),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      zhk.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                    const SizedBox(height: 6),
+                    profile.isSubscribed
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            child: Text(
+                              zhk.isProblematic
+                                  ? context.tr('status_red_zone_short')
+                                  : context.tr('status_guaranteed_short'),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: statusColor),
+                            ),
+                          )
+                        : Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.lock_outline, size: 11, color: colorScheme.onSurfaceVariant),
+                              const SizedBox(width: 3),
+                              Text(context.tr('status_locked_short'),
+                                  style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                            ],
+                          ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

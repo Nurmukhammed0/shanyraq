@@ -190,6 +190,16 @@ class AppStrings {
       AppLanguage.kz: 'Жарнама мәселелері бойынша: shanyraqsend@gmail.com',
       AppLanguage.en: 'For advertising inquiries: shanyraqsend@gmail.com',
     },
+    'home_catalog_title': {
+      AppLanguage.ru: 'Каталог ЖК',
+      AppLanguage.kz: 'ЖК каталогы',
+      AppLanguage.en: 'Complex catalog',
+    },
+    'home_catalog_more': {
+      AppLanguage.ru: 'Показать все',
+      AppLanguage.kz: 'Барлығын көрсету',
+      AppLanguage.en: 'Show all',
+    },
 
     // Избранное
     'favorites_empty_title': {
