@@ -159,6 +159,37 @@ class AppStrings {
       AppLanguage.kz: 'Алматы',
       AppLanguage.en: 'Almaty',
     },
+    'home_ad_badge': {AppLanguage.ru: 'Реклама', AppLanguage.kz: 'Жарнама', AppLanguage.en: 'Ad'},
+    'home_ad_stat': {
+      AppLanguage.ru: '{count} ЖК в базе',
+      AppLanguage.kz: '{count} ЖК базада',
+      AppLanguage.en: '{count} complexes tracked',
+    },
+    'home_ad_title': {
+      AppLanguage.ru: 'Шаңырақ — проверка новостроек Алматы',
+      AppLanguage.kz: 'Шаңырақ — Алматы жаңа құрылыстарын тексеру',
+      AppLanguage.en: 'Shanyraq — check Almaty new builds',
+    },
+    'home_ad_body': {
+      AppLanguage.ru: 'Смотрите статус ЖК и документы ещё до того, как отдать деньги застройщику.',
+      AppLanguage.kz: 'Құрылысшыға ақша беруден бұрын ЖК мәртебесі мен құжаттарын қараңыз.',
+      AppLanguage.en: 'Check a complex\'s status and documents before you pay a developer.',
+    },
+    'home_ad_cta': {
+      AppLanguage.ru: 'Подробнее',
+      AppLanguage.kz: 'Толығырақ',
+      AppLanguage.en: 'Learn more',
+    },
+    'home_ad_placeholder_note': {
+      AppLanguage.ru: 'Тут может быть ваша реклама',
+      AppLanguage.kz: 'Мұнда сіздің жарнамаңыз болуы мүмкін',
+      AppLanguage.en: 'Your ad could be here',
+    },
+    'home_ad_contact_snackbar': {
+      AppLanguage.ru: 'По вопросам рекламы: shanyraqsend@gmail.com',
+      AppLanguage.kz: 'Жарнама мәселелері бойынша: shanyraqsend@gmail.com',
+      AppLanguage.en: 'For advertising inquiries: shanyraqsend@gmail.com',
+    },
 
     // Избранное
     'favorites_empty_title': {
