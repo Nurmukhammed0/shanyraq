@@ -75,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icons.home_work_outlined,
             title: context.tr('home_buy_title'),
             subtitle: context.tr('home_buy_subtitle'),
-            badge: context.tr('home_buy_badge'),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const BuyHouseScreen()),
             ),

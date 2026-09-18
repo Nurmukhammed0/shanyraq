@@ -127,22 +127,153 @@ class AppStrings {
       AppLanguage.en: 'Buy a home',
     },
     'home_buy_subtitle': {
-      AppLanguage.ru: 'Подбор и оформление жилья',
-      AppLanguage.kz: 'Тұрғын үй таңдау және рәсімдеу',
-      AppLanguage.en: 'Home search and purchase',
+      AppLanguage.ru: 'Объявления от собственников',
+      AppLanguage.kz: 'Меншік иелерінің хабарландырулары',
+      AppLanguage.en: 'Listings from property owners',
     },
-    'home_buy_badge': {
-      AppLanguage.ru: 'Проект готовится',
-      AppLanguage.kz: 'Жоба дайындалуда',
-      AppLanguage.en: 'Coming soon',
+    'buy_house_disclaimer': {
+      AppLanguage.ru: 'Объявления добавляют сами собственники. Мы не проверяем документы '
+          'и договорённости по сделке — сверяйте их самостоятельно перед покупкой.',
+      AppLanguage.kz: 'Хабарландыруларды меншік иелерінің өздері қосады. Біз құжаттар мен '
+          'мәміле келісімдерін тексермейміз — сатып алу алдында өзіңіз тексеріңіз.',
+      AppLanguage.en: 'Listings are posted by owners themselves. We don\'t verify documents '
+          'or deal terms — check them yourself before buying.',
     },
-    'buy_house_coming_body': {
-      AppLanguage.ru: 'Мы работаем над разделом покупки жилья. Скоро здесь появится '
-          'подбор и оформление ЖК.',
-      AppLanguage.kz: 'Біз тұрғын үй сатып алу бөлімін дайындап жатырмыз. Жақында '
-          'мұнда ЖК таңдау және рәсімдеу пайда болады.',
-      AppLanguage.en: 'We\'re working on the home-buying section. Complex search '
-          'and purchase are coming here soon.',
+    'buy_house_add_button': {
+      AppLanguage.ru: 'Добавить объявление',
+      AppLanguage.kz: 'Хабарландыру қосу',
+      AppLanguage.en: 'Add listing',
+    },
+    'buy_house_empty_title': {
+      AppLanguage.ru: 'Пока нет объявлений',
+      AppLanguage.kz: 'Әзірге хабарландырулар жоқ',
+      AppLanguage.en: 'No listings yet',
+    },
+    'buy_house_empty_body': {
+      AppLanguage.ru: 'Станьте первым — добавьте своё объявление о продаже.',
+      AppLanguage.kz: 'Бірінші болыңыз — сату туралы хабарландыруыңызды қосыңыз.',
+      AppLanguage.en: 'Be the first — add your own listing.',
+    },
+    'listing_rooms_short': {
+      AppLanguage.ru: '{n}-комн.',
+      AppLanguage.kz: '{n}-бөлм.',
+      AppLanguage.en: '{n}-room',
+    },
+    'listing_area_short': {
+      AppLanguage.ru: '{n} м²',
+      AppLanguage.kz: '{n} м²',
+      AppLanguage.en: '{n} m²',
+    },
+    'listing_call_button': {
+      AppLanguage.ru: 'Позвонить',
+      AppLanguage.kz: 'Қоңырау шалу',
+      AppLanguage.en: 'Call',
+    },
+    'listing_owner_fallback': {
+      AppLanguage.ru: 'Собственник',
+      AppLanguage.kz: 'Меншік иесі',
+      AppLanguage.en: 'Owner',
+    },
+    'listing_detail_disclaimer': {
+      AppLanguage.ru: 'Это объявление добавил собственник напрямую. Шаңырақ не проверял '
+          'документы и договорённости по этому объекту — пожалуйста, проверьте их '
+          'самостоятельно перед сделкой.',
+      AppLanguage.kz: 'Бұл хабарландыруды меншік иесі тікелей қосты. Шаңырақ бұл нысан '
+          'бойынша құжаттар мен келісімдерді тексермеді — мәміле алдында өзіңіз тексеріңіз.',
+      AppLanguage.en: 'This listing was posted directly by the owner. Shanyraq has not '
+          'verified the documents or deal terms for this property — please check them '
+          'yourself before making a deal.',
+    },
+    'listing_delete_confirm_title': {
+      AppLanguage.ru: 'Удалить объявление?',
+      AppLanguage.kz: 'Хабарландыруды жою керек пе?',
+      AppLanguage.en: 'Delete this listing?',
+    },
+    'listing_delete_confirm_body': {
+      AppLanguage.ru: 'Это действие нельзя отменить.',
+      AppLanguage.kz: 'Бұл әрекетті болдырмау мүмкін емес.',
+      AppLanguage.en: 'This action cannot be undone.',
+    },
+    'listing_edit_title': {
+      AppLanguage.ru: 'Новое объявление',
+      AppLanguage.kz: 'Жаңа хабарландыру',
+      AppLanguage.en: 'New listing',
+    },
+    'listing_edit_photo_label': {
+      AppLanguage.ru: 'Фото',
+      AppLanguage.kz: 'Фото',
+      AppLanguage.en: 'Photo',
+    },
+    'listing_edit_upload_button': {
+      AppLanguage.ru: 'Загрузить фото',
+      AppLanguage.kz: 'Фото жүктеу',
+      AppLanguage.en: 'Upload photo',
+    },
+    'listing_edit_uploading': {
+      AppLanguage.ru: 'Загрузка…',
+      AppLanguage.kz: 'Жүктелуде…',
+      AppLanguage.en: 'Uploading…',
+    },
+    'listing_edit_title_field': {
+      AppLanguage.ru: 'Заголовок объявления',
+      AppLanguage.kz: 'Хабарландыру тақырыбы',
+      AppLanguage.en: 'Listing title',
+    },
+    'listing_edit_price': {
+      AppLanguage.ru: 'Цена, ₸',
+      AppLanguage.kz: 'Бағасы, ₸',
+      AppLanguage.en: 'Price, ₸',
+    },
+    'listing_edit_rooms': {
+      AppLanguage.ru: 'Комнат',
+      AppLanguage.kz: 'Бөлме саны',
+      AppLanguage.en: 'Rooms',
+    },
+    'listing_edit_area': {
+      AppLanguage.ru: 'Площадь, м²',
+      AppLanguage.kz: 'Ауданы, м²',
+      AppLanguage.en: 'Area, m²',
+    },
+    'listing_edit_address': {
+      AppLanguage.ru: 'Адрес',
+      AppLanguage.kz: 'Мекенжайы',
+      AppLanguage.en: 'Address',
+    },
+    'listing_edit_description': {
+      AppLanguage.ru: 'Описание',
+      AppLanguage.kz: 'Сипаттама',
+      AppLanguage.en: 'Description',
+    },
+    'listing_edit_contact_name': {
+      AppLanguage.ru: 'Ваше имя',
+      AppLanguage.kz: 'Атыңыз',
+      AppLanguage.en: 'Your name',
+    },
+    'listing_edit_phone': {
+      AppLanguage.ru: 'Телефон для связи',
+      AppLanguage.kz: 'Байланыс телефоны',
+      AppLanguage.en: 'Contact phone',
+    },
+    'listing_edit_required': {
+      AppLanguage.ru: 'Обязательное поле',
+      AppLanguage.kz: 'Міндетті өріс',
+      AppLanguage.en: 'Required field',
+    },
+    'listing_edit_disclaimer': {
+      AppLanguage.ru: 'Публикуя объявление, вы подтверждаете, что вправе продавать этот '
+          'объект. Документы и договор покупатель проверяет самостоятельно — Шаңырақ '
+          'их не проверяет.',
+      AppLanguage.kz: 'Хабарландыруды жариялай отырып, сіз бұл нысанды сатуға құқығыңыз '
+          'барын растайсыз. Құжаттар мен келісімшартты сатып алушы өзі тексереді — '
+          'Шаңырақ оларды тексермейді.',
+      AppLanguage.en: 'By publishing this listing you confirm you have the right to sell '
+          'this property. The buyer checks the documents and contract themselves — '
+          'Shanyraq does not verify them.',
+    },
+    'listing_edit_publish_button': {
+      AppLanguage.ru: 'Опубликовать',
+      AppLanguage.kz: 'Жариялау',
+      AppLanguage.en: 'Publish',
     },
     'zhk_list_empty_title': {
       AppLanguage.ru: 'Ничего не найдено',
