@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
 import '../services/profile_service.dart';
+import '../widgets/responsive.dart';
 
 class EditNameScreen extends StatefulWidget {
   const EditNameScreen({super.key});
@@ -88,9 +89,11 @@ class _EditNameScreenState extends State<EditNameScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('profile_edit_name_row'))),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
+      body: DesktopConstrained(
+        maxWidth: 480,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
           Center(
             child: Stack(
               children: [
@@ -165,7 +168,8 @@ class _EditNameScreenState extends State<EditNameScreen> {
                   : Text(context.tr('profile_save_name_button')),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

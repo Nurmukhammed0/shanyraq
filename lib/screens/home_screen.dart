@@ -5,6 +5,7 @@ import '../l10n/app_strings.dart';
 import '../models/zhk.dart';
 import '../services/profile_service.dart';
 import '../services/zhk_repository.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'about_screen.dart';
 import 'buy_house_screen.dart';
@@ -59,9 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('app_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
+      body: DesktopConstrained(
+        maxWidth: 820,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
           _HomeActionCard(
             icon: Icons.description_outlined,
             title: context.tr('home_documents_title'),
@@ -104,7 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
-        ],
+          ],
+        ),
       ),
     );
   }

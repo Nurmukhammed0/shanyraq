@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import '../services/listing_repository.dart';
 import '../services/profile_service.dart';
 import '../widgets/empty_state_illustration.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'listing_detail_screen.dart';
 import 'listing_edit_screen.dart';
@@ -116,44 +117,88 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
                 )
               : RefreshIndicator(
                   onRefresh: _load,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(Icons.info_outline, size: 18, color: colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(context.tr('buy_house_disclaimer'),
-                                  style: TextStyle(
-                                      fontSize: 12.5, color: colorScheme.onSurfaceVariant, height: 1.4)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (_listings.isEmpty)
-                        _buildEmpty(context)
-                      else
-                        ..._listings.map((l) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: _ListingCard(listing: l),
-                            )),
-                    ],
-                  ),
+                  child: isDesktopWidth(context) ? _buildDesktopBody(context) : _buildMobileBody(context),
                 ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _onAddPressed,
         icon: Icon(profile.isSubscribed ? Icons.add : Icons.lock_outline),
         label: Text(context.tr('buy_house_add_button')),
       ),
+    );
+  }
+
+  Widget _buildDisclaimer(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 18, color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(context.tr('buy_house_disclaimer'),
+                style: TextStyle(fontSize: 12.5, color: colorScheme.onSurfaceVariant, height: 1.4)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileBody(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+      children: [
+        _buildDisclaimer(context),
+        const SizedBox(height: 16),
+        if (_listings.isEmpty)
+          _buildEmpty(context)
+        else
+          ..._listings.map((l) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _ListingCard(listing: l),
+              )),
+      ],
+    );
+  }
+
+  // На широком экране список одной узкой колонкой на всё окно выглядел
+  // бы как растянутая мобильная вёрстка — раскладываем карточки сеткой
+  // через слайверы (обычный GridView внутри ListView потребовал бы
+  // shrinkWrap и терял бы ленивую отрисовку).
+  Widget _buildDesktopBody(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          sliver: SliverToBoxAdapter(child: _buildDisclaimer(context)),
+        ),
+        if (_listings.isEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            sliver: SliverToBoxAdapter(child: _buildEmpty(context)),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 420,
+                mainAxisExtent: 108,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, i) => _ListingCard(listing: _listings[i]),
+                childCount: _listings.length,
+              ),
+            ),
+          ),
+      ],
     );
   }
 

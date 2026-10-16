@@ -6,6 +6,7 @@ import '../services/favorites_service.dart';
 import '../services/profile_service.dart';
 import '../services/zhk_repository.dart';
 import '../widgets/empty_state_illustration.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'zhk_detail_screen.dart';
 
@@ -74,33 +75,48 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 )
               : favZhk.isEmpty
                   ? _buildEmpty(context)
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: favZhk.length,
-                      itemBuilder: (context, i) {
-                        final z = favZhk[i];
-                        return _FavoriteCard(
-                          zhk: z,
-                          isSubscribed: profile.isSubscribed,
-                          onRemove: () async {
-                            try {
-                              await favorites.remove(z.id);
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(context.tr('generic_error', {'error': '$e'}))));
-                              }
-                            }
-                          },
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (_) => ZhkDetailScreen(zhk: z)),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                  : isDesktopWidth(context)
+                      ? GridView.builder(
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 440,
+                            mainAxisExtent: 116,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 0,
+                          ),
+                          itemCount: favZhk.length,
+                          itemBuilder: (context, i) =>
+                              _buildCard(context, favZhk[i], favorites, profile),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: favZhk.length,
+                          itemBuilder: (context, i) =>
+                              _buildCard(context, favZhk[i], favorites, profile),
+                        ),
+    );
+  }
+
+  Widget _buildCard(
+      BuildContext context, Zhk z, FavoritesService favorites, ProfileService profile) {
+    return _FavoriteCard(
+      zhk: z,
+      isSubscribed: profile.isSubscribed,
+      onRemove: () async {
+        try {
+          await favorites.remove(z.id);
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(context.tr('generic_error', {'error': '$e'}))));
+          }
+        }
+      },
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => ZhkDetailScreen(zhk: z)),
+        );
+      },
     );
   }
 

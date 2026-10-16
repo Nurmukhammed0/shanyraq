@@ -89,6 +89,12 @@ class _SidebarState extends State<_Sidebar> {
       (Icons.favorite_border, Icons.favorite, context.tr('nav_favorites')),
     ];
 
+    // Важно: позиция иконки НЕ зависит от _collapsed (всегда одна и та же
+    // отступ слева, всегда MainAxisAlignment.start) — схлопывается только
+    // подпись через _CollapsingLabel. Раньше Row дополнительно мгновенно
+    // переключал mainAxisAlignment/padding на center при сворачивании —
+    // из-за этого иконка и синяя подсветка выбранного пункта «прыгали»
+    // вместо того, чтобы плавно ехать вместе с анимацией ширины.
     return AnimatedContainer(
       duration: _duration,
       curve: _curve,
@@ -99,9 +105,8 @@ class _SidebarState extends State<_Sidebar> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: _collapsed ? 0 : 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Row(
-              mainAxisAlignment: _collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
               children: [
                 const AppLogo(size: 30),
                 _CollapsingLabel(
@@ -121,7 +126,7 @@ class _SidebarState extends State<_Sidebar> {
           ),
           const SizedBox(height: 10),
           Align(
-            alignment: _collapsed ? Alignment.center : Alignment.centerRight,
+            alignment: Alignment.centerRight,
             child: IconButton(
               iconSize: 18,
               visualDensity: VisualDensity.compact,
@@ -148,13 +153,8 @@ class _SidebarState extends State<_Sidebar> {
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => widget.onSelect(i),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: _collapsed ? 0 : 12,
-                        vertical: 11,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
                       child: Row(
-                        mainAxisAlignment:
-                            _collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
                         children: [
                           Icon(
                             widget.selected == i ? items[i].$2 : items[i].$1,
@@ -280,9 +280,8 @@ class _UserCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: collapsed ? 0 : 10, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
           child: Row(
-            mainAxisAlignment: collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
             children: [
               avatar,
               Expanded(

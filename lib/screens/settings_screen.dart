@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../services/settings_service.dart';
 import '../widgets/grouped_list.dart';
+import '../widgets/responsive.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -99,9 +100,10 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('settings_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: DesktopConstrained(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           GroupCard(children: [
             MenuRow(
               icon: Icons.palette_outlined,
@@ -136,7 +138,8 @@ class SettingsScreen extends StatelessWidget {
               onChanged: settings.setEmailNotifications,
             ),
           ]),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../models/listing.dart';
 import '../services/auth_service.dart';
 import '../services/listing_repository.dart';
 import '../services/profile_service.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 
 class ListingDetailScreen extends StatelessWidget {
@@ -73,9 +74,11 @@ class ListingDetailScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
+      body: DesktopConstrained(
+        maxWidth: 640,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
           ClipRRect(
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(24),
@@ -182,7 +185,8 @@ class ListingDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

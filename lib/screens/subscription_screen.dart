@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_strings.dart';
 import '../services/profile_service.dart';
 import '../widgets/app_logo.dart';
+import '../widgets/responsive.dart';
 
 const _supportPhone = '+7 771 470 72 22';
 const _supportEmail = 'shanyraqsend@gmail.com';
@@ -33,7 +34,12 @@ class SubscriptionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('subscription_title'))),
       body: SafeArea(
-        child: profile.isSubscribed ? _buildActive(context, profile, colorScheme) : _buildPaywall(context, profile, colorScheme),
+        child: DesktopConstrained(
+          maxWidth: 560,
+          child: profile.isSubscribed
+              ? _buildActive(context, profile, colorScheme)
+              : _buildPaywall(context, profile, colorScheme),
+        ),
       ),
     );
   }

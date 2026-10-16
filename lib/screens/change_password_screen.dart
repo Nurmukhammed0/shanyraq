@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../widgets/password_strength_meter.dart';
+import '../widgets/responsive.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -82,19 +83,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('profile_change_password_row'))),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) => FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(begin: const Offset(0.05, 0), end: Offset.zero)
-                  .animate(animation),
-              child: child,
+      body: DesktopConstrained(
+        maxWidth: 480,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(begin: const Offset(0.05, 0), end: Offset.zero)
+                    .animate(animation),
+                child: child,
+              ),
             ),
+            child: _oldPasswordVerified ? _buildNewPasswordStep(context) : _buildOldPasswordStep(context),
           ),
-          child: _oldPasswordVerified ? _buildNewPasswordStep(context) : _buildOldPasswordStep(context),
         ),
       ),
     );

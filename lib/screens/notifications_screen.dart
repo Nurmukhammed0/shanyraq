@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_strings.dart';
 import '../services/favorites_service.dart';
 import '../widgets/empty_state_illustration.dart';
+import '../widgets/responsive.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -99,7 +100,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: Text(context.tr('notifications_title')),
         actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _load)],
       ),
-      body: _loading
+      body: DesktopConstrained(
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -139,6 +141,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         );
                       },
                     ),
+      ),
     );
   }
 }

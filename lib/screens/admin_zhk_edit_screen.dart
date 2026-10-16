@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
+import '../widgets/responsive.dart';
 
 /// Форма создания/редактирования объекта ЖК. Если [existing] передан —
 /// режим редактирования, иначе создаётся новая запись.
@@ -182,11 +183,13 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
     return Scaffold(
       appBar: AppBar(
           title: Text(_isEditing ? context.tr('admin_zhk_edit_title') : context.tr('admin_zhk_new_title'))),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
+      body: DesktopConstrained(
+        maxWidth: 640,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
             TextFormField(
               controller: _id,
               enabled: !_isEditing,
@@ -310,7 +313,8 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
                       height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : Text(context.tr('save')),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

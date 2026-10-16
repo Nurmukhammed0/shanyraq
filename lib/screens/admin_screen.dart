@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
 import '../widgets/grouped_list.dart';
+import '../widgets/responsive.dart';
 import 'admin_zhk_edit_screen.dart';
 
 /// Админка: хаб с переходом на отдельные экраны — пользователи, объекты
@@ -14,7 +15,8 @@ class AdminScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_title'))),
-      body: ListView(
+      body: DesktopConstrained(
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           GroupCard(children: [
@@ -62,6 +64,7 @@ class AdminScreen extends StatelessWidget {
             ),
           ]),
         ],
+        ),
       ),
     );
   }
@@ -275,7 +278,9 @@ class _UsersScreenState extends State<_UsersScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_users'))),
-      body: _loading
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -393,6 +398,7 @@ class _UsersScreenState extends State<_UsersScreen> {
                     },
                   ),
                 ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddUserDialog,
         tooltip: context.tr('admin_add_user_tooltip'),
@@ -486,7 +492,9 @@ class _ZhkScreenState extends State<_ZhkScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_zhk_objects'))),
-      body: _loading
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -527,6 +535,7 @@ class _ZhkScreenState extends State<_ZhkScreen> {
                     },
                   ),
                 ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openEdit(),
         child: const Icon(Icons.add),
@@ -620,7 +629,9 @@ class _TrashScreenState extends State<_TrashScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_trash'))),
-      body: _loading
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -671,6 +682,7 @@ class _TrashScreenState extends State<_TrashScreen> {
                         },
                       ),
                     ),
+      ),
     );
   }
 }
@@ -727,7 +739,9 @@ class _ReportsScreenState extends State<_ReportsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_reports'))),
-      body: _loading
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -791,6 +805,7 @@ class _ReportsScreenState extends State<_ReportsScreen> {
                         },
                       ),
                     ),
+      ),
     );
   }
 }
@@ -856,7 +871,9 @@ class _ListingsScreenState extends State<_ListingsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_listings'))),
-      body: Column(
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -992,6 +1009,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -1054,7 +1072,9 @@ class _StatsScreenState extends State<_StatsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_stats'))),
-      body: _loading
+      body: DesktopConstrained(
+        maxWidth: 760,
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
@@ -1106,6 +1126,7 @@ class _StatsScreenState extends State<_StatsScreen> {
                     }).toList(),
                   ),
                 ),
+      ),
     );
   }
 }

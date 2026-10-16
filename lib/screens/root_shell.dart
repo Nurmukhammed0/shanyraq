@@ -5,6 +5,7 @@ import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import '../widgets/grouped_list.dart';
+import '../widgets/responsive.dart';
 import 'about_screen.dart';
 import 'admin_screen.dart';
 import 'edit_profile_screen.dart';
@@ -74,9 +75,10 @@ class ProfileView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('nav_profile'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: DesktopConstrained(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -204,7 +206,8 @@ class ProfileView extends StatelessWidget {
               onPressed: () => auth.signOut(),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

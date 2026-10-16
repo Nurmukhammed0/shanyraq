@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
+import '../widgets/responsive.dart';
 
 /// Черновик политики конфиденциальности. Перед публикацией в App Store /
 /// Google Play и реальным запуском подписки — отдать на проверку юристу.
@@ -11,15 +12,18 @@ class PrivacyPolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('about_privacy_policy'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _Section(title: context.tr('privacy_s1_title'), body: context.tr('privacy_s1_body')),
-          _Section(title: context.tr('privacy_s2_title'), body: context.tr('privacy_s2_body')),
-          _Section(title: context.tr('privacy_s3_title'), body: context.tr('privacy_s3_body')),
-          _Section(title: context.tr('privacy_s4_title'), body: context.tr('privacy_s4_body')),
-          _Section(title: context.tr('privacy_s5_title'), body: context.tr('privacy_s5_body')),
-        ],
+      body: DesktopConstrained(
+        maxWidth: 640,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _Section(title: context.tr('privacy_s1_title'), body: context.tr('privacy_s1_body')),
+            _Section(title: context.tr('privacy_s2_title'), body: context.tr('privacy_s2_body')),
+            _Section(title: context.tr('privacy_s3_title'), body: context.tr('privacy_s3_body')),
+            _Section(title: context.tr('privacy_s4_title'), body: context.tr('privacy_s4_body')),
+            _Section(title: context.tr('privacy_s5_title'), body: context.tr('privacy_s5_body')),
+          ],
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
 import '../services/profile_service.dart';
 import '../widgets/construction_status_row.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'admin_zhk_edit_screen.dart';
 import 'login_screen.dart';
@@ -114,9 +115,11 @@ class ZhkDetailScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
+      body: DesktopConstrained(
+        maxWidth: 640,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
           // Фото на всю ширину, статус и избранное — поверх, как на
           // карточке товара, а не мелким текстом сбоку.
           Stack(
@@ -218,7 +221,8 @@ class ZhkDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

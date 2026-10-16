@@ -4,6 +4,7 @@ import '../l10n/app_strings.dart';
 import '../models/listing.dart';
 import '../services/listing_repository.dart';
 import '../widgets/empty_state_illustration.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'listing_detail_screen.dart';
 
@@ -54,7 +55,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('my_listings_title'))),
-      body: _loading
+      body: DesktopConstrained(
+        child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(
@@ -104,6 +106,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                         },
                       ),
                     ),
+      ),
     );
   }
 }

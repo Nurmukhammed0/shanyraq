@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../widgets/grouped_list.dart';
+import '../widgets/responsive.dart';
 import 'change_password_screen.dart';
 import 'edit_name_screen.dart';
 
@@ -43,9 +44,10 @@ class EditProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('edit_profile_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: DesktopConstrained(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           GroupCard(children: [
             MenuRow(
               icon: Icons.badge_outlined,
@@ -103,7 +105,8 @@ class EditProfileScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

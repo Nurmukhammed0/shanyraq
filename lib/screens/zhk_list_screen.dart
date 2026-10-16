@@ -9,6 +9,7 @@ import '../services/profile_service.dart';
 import '../services/zhk_repository.dart';
 import '../widgets/construction_status_row.dart';
 import '../widgets/empty_state_illustration.dart';
+import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
 import 'login_screen.dart';
 import 'map_screen.dart';
@@ -264,6 +265,24 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
       );
     }
     if (points.isEmpty) return _buildEmpty();
+    // На широком экране список стоял бы одной колонкой на всю ширину
+    // окна — визуально это просто растянутая мобильная вёрстка. Вместо
+    // этого раскладываем карточки сеткой.
+    if (isDesktopWidth(context)) {
+      return GridView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+        // mainAxisSpacing: 0 — карточка уже добавляет отступ снизу сама
+        // (единый код для списка и сетки), иначе отступ удвоился бы.
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 440,
+          mainAxisExtent: 116,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 0,
+        ),
+        itemCount: points.length,
+        itemBuilder: (context, i) => _ZhkListCard(zhk: points[i]),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 88),
       itemCount: points.length,

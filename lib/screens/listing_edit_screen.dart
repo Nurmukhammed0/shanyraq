@@ -7,6 +7,7 @@ import '../l10n/app_strings.dart';
 import '../models/listing.dart';
 import '../services/listing_repository.dart';
 import '../services/profile_service.dart';
+import '../widgets/responsive.dart';
 
 /// Форма добавления объявления собственником. Доступна только
 /// с активной подпиской (проверяется и на уровне RLS в базе).
@@ -118,11 +119,13 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('listing_edit_title'))),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
+      body: DesktopConstrained(
+        maxWidth: 560,
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
             Text(context.tr('listing_edit_photo_label'),
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -237,7 +240,8 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
                   ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : Text(context.tr('listing_edit_publish_button')),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

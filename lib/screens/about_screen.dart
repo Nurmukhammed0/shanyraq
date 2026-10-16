@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_strings.dart';
+import '../widgets/responsive.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_screen.dart';
 
@@ -16,9 +17,11 @@ class AboutScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('about_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: DesktopConstrained(
+        maxWidth: 560,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           Center(
             child: Column(
               children: [
@@ -94,7 +97,8 @@ class AboutScreen extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const TermsScreen()),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
