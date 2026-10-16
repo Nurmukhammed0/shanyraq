@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../services/auth_service.dart';
 import '../services/profile_service.dart';
+import 'app_shell.dart';
 import 'login_screen.dart';
-import 'root_shell.dart';
 
 /// Без входа приложение вообще не показывается — сразу экран логина.
 /// Заблокированный админом пользователь тоже не проходит дальше.
@@ -20,7 +20,7 @@ class AuthGate extends StatelessWidget {
     final profile = context.watch<ProfileService>();
     if (profile.isBlocked) return const _BlockedScreen();
 
-    return const RootShell();
+    return const AppShell();
   }
 }
 

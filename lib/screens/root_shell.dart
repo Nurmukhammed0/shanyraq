@@ -32,7 +32,7 @@ class _RootShellState extends State<RootShell> {
     final tabs = [
       const HomeScreen(),
       const FavoritesScreen(),
-      auth.isLoggedIn ? const _ProfileView() : const LoginScreen(),
+      auth.isLoggedIn ? const ProfileView() : const LoginScreen(),
     ];
 
     return Scaffold(
@@ -62,8 +62,8 @@ class _RootShellState extends State<RootShell> {
   }
 }
 
-class _ProfileView extends StatelessWidget {
-  const _ProfileView();
+class ProfileView extends StatelessWidget {
+  const ProfileView();
 
   @override
   Widget build(BuildContext context) {
