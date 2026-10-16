@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
+
 /// Форма создания/редактирования объекта ЖК. Если [existing] передан —
 /// режим редактирования, иначе создаётся новая запись.
 class AdminZhkEditScreen extends StatefulWidget {
@@ -87,7 +89,8 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
       setState(() => _photoUrl.text = publicUrl);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка загрузки фото: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(context.tr('admin_zhk_photo_upload_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _uploadingPhoto = false);
     }
@@ -127,7 +130,8 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка сохранения: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(context.tr('admin_zhk_save_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -138,7 +142,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Фото', style: Theme.of(context).textTheme.titleSmall),
+        Text(context.tr('admin_zhk_photo_label'), style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -159,12 +163,14 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
           icon: _uploadingPhoto
               ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
               : const Icon(Icons.upload),
-          label: Text(_uploadingPhoto ? 'Загрузка...' : 'Загрузить фото'),
+          label: Text(_uploadingPhoto
+              ? context.tr('admin_zhk_photo_uploading')
+              : context.tr('admin_zhk_photo_upload_button')),
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _photoUrl,
-          decoration: const InputDecoration(labelText: 'Или ссылка на фото (URL)'),
+          decoration: InputDecoration(labelText: context.tr('admin_zhk_photo_url_label')),
           onChanged: (_) => setState(() {}),
         ),
       ],
@@ -174,7 +180,8 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Редактировать ЖК' : 'Новый ЖК')),
+      appBar: AppBar(
+          title: Text(_isEditing ? context.tr('admin_zhk_edit_title') : context.tr('admin_zhk_new_title'))),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -183,43 +190,50 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
             TextFormField(
               controller: _id,
               enabled: !_isEditing,
-              decoration: const InputDecoration(labelText: 'ID (уникальный, латиницей)'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Обязательное поле' : null,
+              decoration: InputDecoration(labelText: context.tr('admin_zhk_id_label')),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? context.tr('admin_zhk_required_field') : null,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _name,
-              decoration: const InputDecoration(labelText: 'Название'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Обязательное поле' : null,
+              decoration: InputDecoration(labelText: context.tr('admin_zhk_name_label')),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? context.tr('admin_zhk_required_field') : null,
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _status,
-              decoration: const InputDecoration(labelText: 'Статус'),
-              items: const [
-                DropdownMenuItem(value: 'problematic', child: Text('Проблемный / красная зона')),
-                DropdownMenuItem(value: 'completed_guaranteed', child: Text('Завершён под госгарантией')),
+              decoration: InputDecoration(labelText: context.tr('admin_zhk_status_label')),
+              items: [
+                DropdownMenuItem(value: 'problematic', child: Text(context.tr('zhk_status_problematic'))),
+                DropdownMenuItem(
+                    value: 'completed_guaranteed', child: Text(context.tr('zhk_status_guaranteed'))),
               ],
               onChanged: (v) => setState(() => _status = v ?? 'problematic'),
             ),
             const SizedBox(height: 12),
-            TextFormField(controller: _district, decoration: const InputDecoration(labelText: 'Район')),
-            const SizedBox(height: 12),
-            TextFormField(controller: _address, decoration: const InputDecoration(labelText: 'Адрес')),
+            TextFormField(
+                controller: _district, decoration: InputDecoration(labelText: context.tr('filter_district_hint'))),
             const SizedBox(height: 12),
             TextFormField(
-                controller: _developer, decoration: const InputDecoration(labelText: 'Застройщик')),
+                controller: _address, decoration: InputDecoration(labelText: context.tr('listing_edit_address'))),
+            const SizedBox(height: 12),
+            TextFormField(
+                controller: _developer,
+                decoration: InputDecoration(labelText: context.tr('admin_zhk_developer_label'))),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String?>(
                     value: _constructionStatus,
-                    decoration: const InputDecoration(labelText: 'Стройка (видно всем)'),
-                    items: const [
-                      DropdownMenuItem(value: null, child: Text('Не указано')),
-                      DropdownMenuItem(value: 'built', child: Text('Построен')),
-                      DropdownMenuItem(value: 'in_progress', child: Text('Строится')),
+                    decoration: InputDecoration(labelText: context.tr('admin_zhk_construction_label')),
+                    items: [
+                      DropdownMenuItem(value: null, child: Text(context.tr('admin_zhk_construction_unspecified'))),
+                      DropdownMenuItem(value: 'built', child: Text(context.tr('zhk_construction_built'))),
+                      DropdownMenuItem(
+                          value: 'in_progress', child: Text(context.tr('zhk_construction_in_progress'))),
                     ],
                     onChanged: (v) => setState(() => _constructionStatus = v),
                   ),
@@ -228,7 +242,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _completionYear,
-                    decoration: const InputDecoration(labelText: 'Год сдачи'),
+                    decoration: InputDecoration(labelText: context.tr('admin_zhk_completion_year_label')),
                     keyboardType: TextInputType.number,
                   ),
                 ),
@@ -240,7 +254,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _lat,
-                    decoration: const InputDecoration(labelText: 'Широта (lat)'),
+                    decoration: InputDecoration(labelText: context.tr('admin_zhk_lat_label')),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                   ),
                 ),
@@ -248,7 +262,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _lng,
-                    decoration: const InputDecoration(labelText: 'Долгота (lng)'),
+                    decoration: InputDecoration(labelText: context.tr('admin_zhk_lng_label')),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                   ),
                 ),
@@ -257,35 +271,35 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
             const SizedBox(height: 12),
             _buildPhotoField(context),
             const Divider(height: 32),
-            Text('Детали (видны только с подпиской)', style: Theme.of(context).textTheme.titleSmall),
+            Text(context.tr('admin_zhk_details_section_title'), style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 12),
             TextFormField(
               controller: _documentation,
-              decoration: const InputDecoration(labelText: 'Разрешительная документация'),
+              decoration: InputDecoration(labelText: context.tr('zhk_documentation')),
               maxLines: 2,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _techStatus,
-              decoration: const InputDecoration(labelText: 'Техническое состояние'),
+              decoration: InputDecoration(labelText: context.tr('zhk_tech_status')),
               maxLines: 2,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _violations,
-              decoration: const InputDecoration(labelText: 'Нарушения'),
+              decoration: InputDecoration(labelText: context.tr('zhk_violations')),
               maxLines: 3,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _measures,
-              decoration: const InputDecoration(labelText: 'Принятые меры'),
+              decoration: InputDecoration(labelText: context.tr('zhk_measures')),
               maxLines: 3,
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: _court,
-              decoration: const InputDecoration(labelText: 'Судебный статус'),
+              decoration: InputDecoration(labelText: context.tr('zhk_court')),
               maxLines: 2,
             ),
             const SizedBox(height: 24),
@@ -294,7 +308,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
               child: _saving
                   ? const SizedBox(
                       height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Сохранить'),
+                  : Text(context.tr('save')),
             ),
           ],
         ),

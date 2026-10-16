@@ -167,10 +167,20 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
           const EmptyStateIllustration(badgeIcon: Icons.home_work_outlined),
           const SizedBox(height: 20),
           Text(context.tr('buy_house_empty_title'),
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
           const SizedBox(height: 8),
-          Text(context.tr('buy_house_empty_body'),
-              textAlign: TextAlign.center, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(context.tr('buy_house_empty_body'),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: colorScheme.onSurfaceVariant, height: 1.4)),
+          ),
+          const SizedBox(height: 22),
+          FilledButton.icon(
+            onPressed: _onAddPressed,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(context.tr('buy_house_add_button')),
+          ),
         ],
       ),
     );

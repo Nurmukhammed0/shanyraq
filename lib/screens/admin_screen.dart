@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../l10n/app_strings.dart';
 import '../widgets/grouped_list.dart';
 import 'admin_zhk_edit_screen.dart';
 
@@ -12,49 +13,49 @@ class AdminScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Админка')),
+      appBar: AppBar(title: Text(context.tr('admin_title'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           GroupCard(children: [
             MenuRow(
               icon: Icons.people_outline,
-              title: 'Пользователи',
+              title: context.tr('admin_users'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _UsersScreen()),
               ),
             ),
             MenuRow(
               icon: Icons.apartment_outlined,
-              title: 'Объекты ЖК',
+              title: context.tr('admin_zhk_objects'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _ZhkScreen()),
               ),
             ),
             MenuRow(
               icon: Icons.delete_outline,
-              title: 'Корзина',
+              title: context.tr('admin_trash'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _TrashScreen()),
               ),
             ),
             MenuRow(
               icon: Icons.flag_outlined,
-              title: 'Обращения',
+              title: context.tr('admin_reports'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _ReportsScreen()),
               ),
             ),
             MenuRow(
               icon: Icons.home_work_outlined,
-              title: 'Объявления «Купить дом»',
+              title: context.tr('admin_listings'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _ListingsScreen()),
               ),
             ),
             MenuRow(
               icon: Icons.bar_chart_outlined,
-              title: 'Статистика',
+              title: context.tr('admin_stats'),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const _StatsScreen()),
               ),
@@ -101,7 +102,7 @@ class _UsersScreenState extends State<_UsersScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить пользователей: $e';
+        _error = context.tr('admin_users_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -123,7 +124,8 @@ class _UsersScreenState extends State<_UsersScreen> {
       _load();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_generic', {'error': '$e'}))));
       }
     }
   }
@@ -132,14 +134,14 @@ class _UsersScreenState extends State<_UsersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить пользователя?'),
-        content: Text('«$email» будет удалён безвозвратно вместе со всеми его данными. Это необратимо.'),
+        title: Text(context.tr('admin_user_delete_confirm_title')),
+        content: Text(context.tr('admin_user_delete_confirm_body', {'email': email})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.tr('cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE24B4A)),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить'),
+            child: Text(context.tr('delete')),
           ),
         ],
       ),
@@ -150,7 +152,8 @@ class _UsersScreenState extends State<_UsersScreen> {
       _load();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка удаления: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_delete', {'error': '$e'}))));
       }
     }
   }
@@ -172,7 +175,7 @@ class _UsersScreenState extends State<_UsersScreen> {
             final email = emailController.text.trim();
             final password = passwordController.text;
             if (email.isEmpty || password.length < 8) {
-              setSheetState(() => error = 'Укажите email и пароль (минимум 8 символов)');
+              setSheetState(() => error = context.tr('admin_add_user_validation'));
               return;
             }
             setSheetState(() {
@@ -199,13 +202,13 @@ class _UsersScreenState extends State<_UsersScreen> {
             } catch (e) {
               setSheetState(() {
                 submitting = false;
-                error = 'Не удалось создать: $e';
+                error = context.tr('admin_add_user_create_error', {'error': '$e'});
               });
             }
           }
 
           return AlertDialog(
-            title: const Text('Новый пользователь'),
+            title: Text(context.tr('admin_add_user_title')),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -214,29 +217,29 @@ class _UsersScreenState extends State<_UsersScreen> {
                   TextField(
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    decoration: InputDecoration(labelText: context.tr('admin_add_user_email_label')),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Пароль (мин. 8 символов)'),
+                    decoration: InputDecoration(labelText: context.tr('admin_add_user_password_label')),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Имя (необязательно)'),
+                    decoration: InputDecoration(labelText: context.tr('admin_add_user_name_label')),
                   ),
                   const SizedBox(height: 6),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Подписка сразу активна'),
+                    title: Text(context.tr('admin_add_user_subscribed_switch')),
                     value: subscribed,
                     onChanged: (v) => setSheetState(() => subscribed = v),
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Роль администратора'),
+                    title: Text(context.tr('admin_add_user_admin_switch')),
                     value: asAdmin,
                     onChanged: (v) => setSheetState(() => asAdmin = v),
                   ),
@@ -250,14 +253,14 @@ class _UsersScreenState extends State<_UsersScreen> {
             actions: [
               TextButton(
                 onPressed: submitting ? null : () => Navigator.pop(ctx, false),
-                child: const Text('Отмена'),
+                child: Text(context.tr('cancel')),
               ),
               FilledButton(
                 onPressed: submitting ? null : submit,
                 child: submitting
                     ? const SizedBox(
                         width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Создать'),
+                    : Text(context.tr('admin_add_user_create_button')),
               ),
             ],
           );
@@ -271,7 +274,7 @@ class _UsersScreenState extends State<_UsersScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Пользователи')),
+      appBar: AppBar(title: Text(context.tr('admin_users'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -284,7 +287,7 @@ class _UsersScreenState extends State<_UsersScreen> {
                     itemBuilder: (context, i) {
                       final p = _profiles[i];
                       final id = p['id'] as String;
-                      final email = p['email'] as String? ?? '(без email)';
+                      final email = p['email'] as String? ?? context.tr('admin_user_no_email');
                       final role = p['role'] as String? ?? 'user';
                       final isSubscribed = p['is_subscribed'] == true;
                       final isAdmin = role == 'admin';
@@ -321,7 +324,11 @@ class _UsersScreenState extends State<_UsersScreen> {
                                           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
                                           overflow: TextOverflow.ellipsis),
                                       Text(
-                                        isBlocked ? 'заблокирован' : (isAdmin ? 'admin' : 'user'),
+                                        isBlocked
+                                            ? context.tr('admin_user_blocked_label')
+                                            : (isAdmin
+                                                ? context.tr('admin_role_admin')
+                                                : context.tr('admin_role_user')),
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: isBlocked ? const Color(0xFFE24B4A) : colorScheme.onSurfaceVariant,
@@ -334,7 +341,7 @@ class _UsersScreenState extends State<_UsersScreen> {
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Подписка',
+                                    Text(context.tr('admin_user_subscription_label'),
                                         style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
                                     Switch(
                                       value: isSubscribed,
@@ -347,7 +354,8 @@ class _UsersScreenState extends State<_UsersScreen> {
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Admin', style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
+                                    Text(context.tr('admin_user_admin_label'),
+                                        style: TextStyle(fontSize: 10, color: colorScheme.onSurfaceVariant)),
                                     Switch(
                                       value: isAdmin,
                                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -364,7 +372,9 @@ class _UsersScreenState extends State<_UsersScreen> {
                                 TextButton.icon(
                                   onPressed: () => _setBlocked(id, !isBlocked),
                                   icon: Icon(isBlocked ? Icons.lock_open : Icons.block, size: 16),
-                                  label: Text(isBlocked ? 'Разблокировать' : 'Заблокировать'),
+                                  label: Text(isBlocked
+                                      ? context.tr('admin_user_unblock')
+                                      : context.tr('admin_user_block')),
                                   style: TextButton.styleFrom(
                                     foregroundColor: isBlocked ? const Color(0xFF22C55E) : Colors.orange.shade800,
                                   ),
@@ -372,7 +382,7 @@ class _UsersScreenState extends State<_UsersScreen> {
                                 TextButton.icon(
                                   onPressed: () => _deleteUser(id, email),
                                   icon: const Icon(Icons.delete_outline, size: 16),
-                                  label: const Text('Удалить'),
+                                  label: Text(context.tr('delete')),
                                   style: TextButton.styleFrom(foregroundColor: const Color(0xFFE24B4A)),
                                 ),
                               ],
@@ -385,7 +395,7 @@ class _UsersScreenState extends State<_UsersScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddUserDialog,
-        tooltip: 'Добавить пользователя',
+        tooltip: context.tr('admin_add_user_tooltip'),
         child: const Icon(Icons.person_add_alt_1),
       ),
     );
@@ -427,7 +437,7 @@ class _ZhkScreenState extends State<_ZhkScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить объекты: $e';
+        _error = context.tr('admin_zhk_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -437,11 +447,12 @@ class _ZhkScreenState extends State<_ZhkScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Переместить в корзину?'),
-        content: Text('«$name» пропадёт из списка, но его можно будет восстановить во вкладке «Корзина».'),
+        title: Text(context.tr('admin_zhk_trash_confirm_title')),
+        content: Text(context.tr('admin_zhk_trash_confirm_body', {'name': name})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('В корзину')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.tr('cancel'))),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true), child: Text(context.tr('admin_zhk_trash_button'))),
         ],
       ),
     );
@@ -451,12 +462,13 @@ class _ZhkScreenState extends State<_ZhkScreen> {
           await _client.from('zhk').update({'deleted_at': DateTime.now().toIso8601String()}).eq('id', id).select();
       if (updated.isEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Не удалось удалить: сервер не нашёл строку (проверьте id/RLS).')),
+          SnackBar(content: Text(context.tr('admin_zhk_delete_not_found'))),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка удаления: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_delete', {'error': '$e'}))));
       }
     }
     _load();
@@ -473,7 +485,7 @@ class _ZhkScreenState extends State<_ZhkScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Объекты ЖК')),
+      appBar: AppBar(title: Text(context.tr('admin_zhk_objects'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -507,7 +519,7 @@ class _ZhkScreenState extends State<_ZhkScreen> {
                           onTap: () => _openEdit(r),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete_outline),
-                            tooltip: 'В корзину',
+                            tooltip: context.tr('admin_zhk_trash_button'),
                             onPressed: () => _moveToTrash(r['id'] as String, r['name'] as String? ?? ''),
                           ),
                         ),
@@ -559,7 +571,7 @@ class _TrashScreenState extends State<_TrashScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить корзину: $e';
+        _error = context.tr('admin_trash_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -570,7 +582,8 @@ class _TrashScreenState extends State<_TrashScreen> {
       await _client.from('zhk').update({'deleted_at': null}).eq('id', id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка восстановления: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_restore', {'error': '$e'}))));
       }
     }
     _load();
@@ -580,11 +593,13 @@ class _TrashScreenState extends State<_TrashScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить навсегда?'),
-        content: Text('«$name» будет удалён безвозвратно, восстановить будет нельзя.'),
+        title: Text(context.tr('admin_trash_delete_forever_title')),
+        content: Text(context.tr('admin_trash_delete_forever_body', {'name': name})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Удалить навсегда')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.tr('cancel'))),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(context.tr('admin_trash_delete_forever_button'))),
         ],
       ),
     );
@@ -593,7 +608,8 @@ class _TrashScreenState extends State<_TrashScreen> {
       await _client.from('zhk').delete().eq('id', id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка удаления: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_delete', {'error': '$e'}))));
       }
     }
     _load();
@@ -603,14 +619,14 @@ class _TrashScreenState extends State<_TrashScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Корзина')),
+      appBar: AppBar(title: Text(context.tr('admin_trash'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
               : _rows.isEmpty
                   ? Center(
-                      child: Text('Корзина пуста', style: Theme.of(context).textTheme.bodyMedium),
+                      child: Text(context.tr('admin_trash_empty'), style: Theme.of(context).textTheme.bodyMedium),
                     )
                   : RefreshIndicator(
                       onRefresh: _load,
@@ -641,12 +657,12 @@ class _TrashScreenState extends State<_TrashScreen> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.restore),
-                                  tooltip: 'Восстановить',
+                                  tooltip: context.tr('admin_trash_restore_tooltip'),
                                   onPressed: () => _restore(id),
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_forever_outlined),
-                                  tooltip: 'Удалить навсегда',
+                                  tooltip: context.tr('admin_trash_delete_forever_tooltip'),
                                   onPressed: () => _deleteForever(id, name),
                                 ),
                               ],
@@ -695,7 +711,7 @@ class _ReportsScreenState extends State<_ReportsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить обращения: $e';
+        _error = context.tr('admin_reports_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -710,13 +726,13 @@ class _ReportsScreenState extends State<_ReportsScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Обращения')),
+      appBar: AppBar(title: Text(context.tr('admin_reports'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
               : _rows.isEmpty
-                  ? const Center(child: Text('Обращений пока нет'))
+                  ? Center(child: Text(context.tr('admin_reports_empty')))
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.builder(
@@ -751,7 +767,7 @@ class _ReportsScreenState extends State<_ReportsScreen> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
-                                          resolved ? 'Решено' : 'Открыто',
+                                          resolved ? context.tr('admin_report_resolved') : context.tr('admin_report_open'),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -817,7 +833,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить объявления: $e';
+        _error = context.tr('admin_listings_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -829,7 +845,8 @@ class _ListingsScreenState extends State<_ListingsScreen> {
       _load();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('admin_error_generic', {'error': '$e'}))));
       }
     }
   }
@@ -838,7 +855,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Объявления «Купить дом»')),
+      appBar: AppBar(title: Text(context.tr('admin_listings'))),
       body: Column(
         children: [
           Padding(
@@ -848,11 +865,11 @@ class _ListingsScreenState extends State<_ListingsScreen> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  for (final s in const [
-                    ('pending', 'На проверке'),
-                    ('approved', 'Одобрено'),
-                    ('rejected', 'Отклонено'),
-                    ('all', 'Все'),
+                  for (final s in [
+                    ('pending', context.tr('admin_listings_filter_pending')),
+                    ('approved', context.tr('admin_listings_filter_approved')),
+                    ('rejected', context.tr('admin_listings_filter_rejected')),
+                    ('all', context.tr('admin_listings_filter_all')),
                   ])
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -875,7 +892,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                 : _error != null
                     ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
                     : _rows.isEmpty
-                        ? const Center(child: Text('Объявлений нет'))
+                        ? Center(child: Text(context.tr('admin_listings_empty')))
                         : RefreshIndicator(
                             onRefresh: _load,
                             child: ListView.builder(
@@ -890,7 +907,14 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                   'rejected' => const Color(0xFFE24B4A),
                                   _ => Colors.orange.shade800,
                                 };
+                                final statusLabel = switch (status) {
+                                  'approved' => context.tr('listing_status_approved'),
+                                  'rejected' => context.tr('listing_status_rejected'),
+                                  _ => context.tr('listing_status_pending'),
+                                };
                                 final price = (r['price'] as num?)?.toInt();
+                                final contactName =
+                                    (r['contact_name'] as String?) ?? context.tr('admin_listings_no_name');
 
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 10),
@@ -916,7 +940,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                               color: statusColor.withOpacity(0.15),
                                               borderRadius: BorderRadius.circular(8),
                                             ),
-                                            child: Text(status,
+                                            child: Text(statusLabel,
                                                 style: TextStyle(
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w700,
@@ -934,7 +958,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                         style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                       ),
                                       Text(
-                                        '${r['contact_name'] ?? 'Без имени'} · ${r['phone'] ?? ''}',
+                                        '$contactName · ${r['phone'] ?? ''}',
                                         style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                       ),
                                       const Divider(height: 18),
@@ -945,7 +969,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                             TextButton.icon(
                                               onPressed: () => _setStatus(id, 'approved'),
                                               icon: const Icon(Icons.check_circle_outline, size: 16),
-                                              label: const Text('Одобрить'),
+                                              label: Text(context.tr('admin_listings_approve')),
                                               style: TextButton.styleFrom(
                                                   foregroundColor: const Color(0xFF22C55E)),
                                             ),
@@ -953,7 +977,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                             TextButton.icon(
                                               onPressed: () => _setStatus(id, 'rejected'),
                                               icon: const Icon(Icons.cancel_outlined, size: 16),
-                                              label: const Text('Отклонить'),
+                                              label: Text(context.tr('admin_listings_reject')),
                                               style: TextButton.styleFrom(
                                                   foregroundColor: const Color(0xFFE24B4A)),
                                             ),
@@ -1019,7 +1043,7 @@ class _StatsScreenState extends State<_StatsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Не удалось загрузить статистику: $e';
+        _error = context.tr('admin_stats_load_error', {'error': '$e'});
         _loading = false;
       });
     }
@@ -1029,7 +1053,7 @@ class _StatsScreenState extends State<_StatsScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Статистика')),
+      appBar: AppBar(title: Text(context.tr('admin_stats'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -1043,11 +1067,16 @@ class _StatsScreenState extends State<_StatsScreen> {
                     crossAxisSpacing: 12,
                     childAspectRatio: 1.3,
                     children: [
-                      ('Активных ЖК', _activeZhk, Icons.apartment, colorScheme.primary),
-                      ('В корзине', _trashedZhk, Icons.delete_outline, Colors.grey),
-                      ('Пользователей', _totalUsers, Icons.people_outline, colorScheme.primary),
-                      ('С подпиской', _subscribedUsers, Icons.workspace_premium_outlined, const Color(0xFF22C55E)),
-                      ('Открытых обращений', _openReports, Icons.flag_outlined, Colors.orange),
+                      (context.tr('admin_stats_active_zhk'), _activeZhk, Icons.apartment, colorScheme.primary),
+                      (context.tr('admin_stats_trashed_zhk'), _trashedZhk, Icons.delete_outline, Colors.grey),
+                      (context.tr('admin_stats_total_users'), _totalUsers, Icons.people_outline, colorScheme.primary),
+                      (
+                        context.tr('admin_stats_subscribed_users'),
+                        _subscribedUsers,
+                        Icons.workspace_premium_outlined,
+                        const Color(0xFF22C55E)
+                      ),
+                      (context.tr('admin_stats_open_reports'), _openReports, Icons.flag_outlined, Colors.orange),
                     ].map((s) {
                       return Container(
                         padding: const EdgeInsets.all(16),

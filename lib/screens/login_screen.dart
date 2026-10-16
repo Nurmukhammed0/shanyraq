@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Center(child: AppLogo()),
                   const SizedBox(height: 24),
                   const Text(
-                    'Шаңырақ',
+                    'Shanyraq',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),

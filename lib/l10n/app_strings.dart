@@ -22,6 +22,16 @@ class AppStrings {
 
   static const Map<String, Map<AppLanguage, String>> _dict = {
     // Навигация
+    'sidebar_collapse': {
+      AppLanguage.ru: 'Свернуть меню',
+      AppLanguage.kz: 'Мәзірді жию',
+      AppLanguage.en: 'Collapse menu',
+    },
+    'sidebar_expand': {
+      AppLanguage.ru: 'Развернуть меню',
+      AppLanguage.kz: 'Мәзірді жаю',
+      AppLanguage.en: 'Expand menu',
+    },
     'nav_home': {AppLanguage.ru: 'Главная', AppLanguage.kz: 'Басты бет', AppLanguage.en: 'Home'},
     'nav_map': {AppLanguage.ru: 'Карта', AppLanguage.kz: 'Карта', AppLanguage.en: 'Map'},
     'nav_favorites': {
@@ -32,9 +42,11 @@ class AppStrings {
     'nav_profile': {AppLanguage.ru: 'Профиль', AppLanguage.kz: 'Профиль', AppLanguage.en: 'Profile'},
 
     // Общее
+    // Название бренда — везде латиницей (как лого), не переводим:
+    // кириллицу «Шаңырақ» не прочитают англоязычные пользователи.
     'app_title': {
-      AppLanguage.ru: 'Шаңырақ',
-      AppLanguage.kz: 'Шаңырақ',
+      AppLanguage.ru: 'Shanyraq',
+      AppLanguage.kz: 'Shanyraq',
       AppLanguage.en: 'Shanyraq',
     },
     'cancel': {AppLanguage.ru: 'Отмена', AppLanguage.kz: 'Болдырмау', AppLanguage.en: 'Cancel'},
@@ -145,14 +157,14 @@ class AppStrings {
       AppLanguage.en: 'Add listing',
     },
     'buy_house_empty_title': {
-      AppLanguage.ru: 'Пока нет объявлений',
-      AppLanguage.kz: 'Әзірге хабарландырулар жоқ',
-      AppLanguage.en: 'No listings yet',
+      AppLanguage.ru: 'Будьте первым!',
+      AppLanguage.kz: 'Бірінші болыңыз!',
+      AppLanguage.en: 'Be the first!',
     },
     'buy_house_empty_body': {
-      AppLanguage.ru: 'Станьте первым — добавьте своё объявление о продаже.',
-      AppLanguage.kz: 'Бірінші болыңыз — сату туралы хабарландыруыңызды қосыңыз.',
-      AppLanguage.en: 'Be the first — add your own listing.',
+      AppLanguage.ru: 'Здесь пока нет ни одного объявления. Добавьте своё — его увидят все, кто ищет жильё в Алматы.',
+      AppLanguage.kz: 'Мұнда әлі бір де хабарландыру жоқ. Өзіңізді қосыңыз — оны Алматыдан үй іздеп жүргендердің бәрі көреді.',
+      AppLanguage.en: 'No listings here yet. Add yours — everyone searching for a home in Almaty will see it.',
     },
     'listing_rooms_short': {
       AppLanguage.ru: '{n}-комн.',
@@ -1326,6 +1338,381 @@ class AppStrings {
       AppLanguage.ru: 'Выйти',
       AppLanguage.kz: 'Шығу',
       AppLanguage.en: 'Sign out',
+    },
+
+    // Админка
+    'admin_title': {AppLanguage.ru: 'Админка', AppLanguage.kz: 'Әкімші панелі', AppLanguage.en: 'Admin'},
+    'admin_users': {AppLanguage.ru: 'Пользователи', AppLanguage.kz: 'Пайдаланушылар', AppLanguage.en: 'Users'},
+    'admin_zhk_objects': {
+      AppLanguage.ru: 'Объекты ЖК',
+      AppLanguage.kz: 'ЖК нысандары',
+      AppLanguage.en: 'Complexes',
+    },
+    'admin_trash': {AppLanguage.ru: 'Корзина', AppLanguage.kz: 'Себет', AppLanguage.en: 'Trash'},
+    'admin_reports': {AppLanguage.ru: 'Обращения', AppLanguage.kz: 'Өтініштер', AppLanguage.en: 'Reports'},
+    'admin_listings': {
+      AppLanguage.ru: 'Объявления «Купить дом»',
+      AppLanguage.kz: '«Үй сатып алу» хабарландырулары',
+      AppLanguage.en: '"Buy a home" listings',
+    },
+    'admin_stats': {AppLanguage.ru: 'Статистика', AppLanguage.kz: 'Статистика', AppLanguage.en: 'Statistics'},
+
+    'admin_error_generic': {
+      AppLanguage.ru: 'Ошибка: {error}',
+      AppLanguage.kz: 'Қате: {error}',
+      AppLanguage.en: 'Error: {error}',
+    },
+    'admin_error_delete': {
+      AppLanguage.ru: 'Ошибка удаления: {error}',
+      AppLanguage.kz: 'Жою қатесі: {error}',
+      AppLanguage.en: 'Delete error: {error}',
+    },
+    'admin_error_restore': {
+      AppLanguage.ru: 'Ошибка восстановления: {error}',
+      AppLanguage.kz: 'Қалпына келтіру қатесі: {error}',
+      AppLanguage.en: 'Restore error: {error}',
+    },
+
+    'admin_users_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить пользователей: {error}',
+      AppLanguage.kz: 'Пайдаланушыларды жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load users: {error}',
+    },
+    'admin_user_delete_confirm_title': {
+      AppLanguage.ru: 'Удалить пользователя?',
+      AppLanguage.kz: 'Пайдаланушыны жою керек пе?',
+      AppLanguage.en: 'Delete this user?',
+    },
+    'admin_user_delete_confirm_body': {
+      AppLanguage.ru: '«{email}» будет удалён безвозвратно вместе со всеми его данными. Это необратимо.',
+      AppLanguage.kz: '«{email}» барлық деректерімен қоса қайтарымсыз жойылады. Бұл әрекетті болдырмау мүмкін емес.',
+      AppLanguage.en: '"{email}" will be permanently deleted along with all their data. This cannot be undone.',
+    },
+    'admin_user_no_email': {
+      AppLanguage.ru: '(без email)',
+      AppLanguage.kz: '(email жоқ)',
+      AppLanguage.en: '(no email)',
+    },
+    'admin_user_blocked_label': {
+      AppLanguage.ru: 'заблокирован',
+      AppLanguage.kz: 'бұғатталған',
+      AppLanguage.en: 'blocked',
+    },
+    'admin_role_admin': {AppLanguage.ru: 'админ', AppLanguage.kz: 'әкімші', AppLanguage.en: 'admin'},
+    'admin_role_user': {
+      AppLanguage.ru: 'пользователь',
+      AppLanguage.kz: 'пайдаланушы',
+      AppLanguage.en: 'user',
+    },
+    'admin_user_subscription_label': {
+      AppLanguage.ru: 'Подписка',
+      AppLanguage.kz: 'Жазылым',
+      AppLanguage.en: 'Subscription',
+    },
+    'admin_user_admin_label': {AppLanguage.ru: 'Админ', AppLanguage.kz: 'Әкімші', AppLanguage.en: 'Admin'},
+    'admin_user_unblock': {
+      AppLanguage.ru: 'Разблокировать',
+      AppLanguage.kz: 'Бұғаттан шығару',
+      AppLanguage.en: 'Unblock',
+    },
+    'admin_user_block': {
+      AppLanguage.ru: 'Заблокировать',
+      AppLanguage.kz: 'Бұғаттау',
+      AppLanguage.en: 'Block',
+    },
+    'admin_add_user_tooltip': {
+      AppLanguage.ru: 'Добавить пользователя',
+      AppLanguage.kz: 'Пайдаланушы қосу',
+      AppLanguage.en: 'Add user',
+    },
+    'admin_add_user_title': {
+      AppLanguage.ru: 'Новый пользователь',
+      AppLanguage.kz: 'Жаңа пайдаланушы',
+      AppLanguage.en: 'New user',
+    },
+    'admin_add_user_validation': {
+      AppLanguage.ru: 'Укажите email и пароль (минимум 8 символов)',
+      AppLanguage.kz: 'Email мен құпия сөзді енгізіңіз (кемінде 8 таңба)',
+      AppLanguage.en: 'Enter an email and password (at least 8 characters)',
+    },
+    'admin_add_user_create_error': {
+      AppLanguage.ru: 'Не удалось создать: {error}',
+      AppLanguage.kz: 'Құру мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to create: {error}',
+    },
+    'admin_add_user_email_label': {AppLanguage.ru: 'Email', AppLanguage.kz: 'Email', AppLanguage.en: 'Email'},
+    'admin_add_user_password_label': {
+      AppLanguage.ru: 'Пароль (мин. 8 символов)',
+      AppLanguage.kz: 'Құпия сөз (кемінде 8 таңба)',
+      AppLanguage.en: 'Password (min. 8 characters)',
+    },
+    'admin_add_user_name_label': {
+      AppLanguage.ru: 'Имя (необязательно)',
+      AppLanguage.kz: 'Аты (міндетті емес)',
+      AppLanguage.en: 'Name (optional)',
+    },
+    'admin_add_user_subscribed_switch': {
+      AppLanguage.ru: 'Подписка сразу активна',
+      AppLanguage.kz: 'Жазылым бірден белсенді',
+      AppLanguage.en: 'Subscription active right away',
+    },
+    'admin_add_user_admin_switch': {
+      AppLanguage.ru: 'Роль администратора',
+      AppLanguage.kz: 'Әкімші рөлі',
+      AppLanguage.en: 'Administrator role',
+    },
+    'admin_add_user_create_button': {
+      AppLanguage.ru: 'Создать',
+      AppLanguage.kz: 'Құру',
+      AppLanguage.en: 'Create',
+    },
+
+    'admin_zhk_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить объекты: {error}',
+      AppLanguage.kz: 'Нысандарды жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load complexes: {error}',
+    },
+    'admin_zhk_trash_confirm_title': {
+      AppLanguage.ru: 'Переместить в корзину?',
+      AppLanguage.kz: 'Себетке жылжыту керек пе?',
+      AppLanguage.en: 'Move to trash?',
+    },
+    'admin_zhk_trash_confirm_body': {
+      AppLanguage.ru: '«{name}» пропадёт из списка, но его можно будет восстановить во вкладке «Корзина».',
+      AppLanguage.kz: '«{name}» тізімнен жоғалады, бірақ оны «Себет» қойындысынан қалпына келтіруге болады.',
+      AppLanguage.en: '"{name}" will disappear from the list, but can be restored from the Trash tab.',
+    },
+    'admin_zhk_trash_button': {
+      AppLanguage.ru: 'В корзину',
+      AppLanguage.kz: 'Себетке',
+      AppLanguage.en: 'Move to trash',
+    },
+    'admin_zhk_delete_not_found': {
+      AppLanguage.ru: 'Не удалось удалить: сервер не нашёл строку (проверьте id/RLS).',
+      AppLanguage.kz: 'Жою мүмкін болмады: сервер жолды таппады (id/RLS тексеріңіз).',
+      AppLanguage.en: 'Could not delete: the server found no matching row (check id/RLS).',
+    },
+
+    'admin_trash_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить корзину: {error}',
+      AppLanguage.kz: 'Себетті жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load trash: {error}',
+    },
+    'admin_trash_empty': {
+      AppLanguage.ru: 'Корзина пуста',
+      AppLanguage.kz: 'Себет бос',
+      AppLanguage.en: 'Trash is empty',
+    },
+    'admin_trash_restore_tooltip': {
+      AppLanguage.ru: 'Восстановить',
+      AppLanguage.kz: 'Қалпына келтіру',
+      AppLanguage.en: 'Restore',
+    },
+    'admin_trash_delete_forever_tooltip': {
+      AppLanguage.ru: 'Удалить навсегда',
+      AppLanguage.kz: 'Мүлдем жою',
+      AppLanguage.en: 'Delete forever',
+    },
+    'admin_trash_delete_forever_title': {
+      AppLanguage.ru: 'Удалить навсегда?',
+      AppLanguage.kz: 'Мүлдем жою керек пе?',
+      AppLanguage.en: 'Delete forever?',
+    },
+    'admin_trash_delete_forever_body': {
+      AppLanguage.ru: '«{name}» будет удалён безвозвратно, восстановить будет нельзя.',
+      AppLanguage.kz: '«{name}» қайтарымсыз жойылады, қалпына келтіру мүмкін болмайды.',
+      AppLanguage.en: '"{name}" will be permanently deleted and cannot be restored.',
+    },
+
+    'admin_reports_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить обращения: {error}',
+      AppLanguage.kz: 'Өтініштерді жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load reports: {error}',
+    },
+    'admin_reports_empty': {
+      AppLanguage.ru: 'Обращений пока нет',
+      AppLanguage.kz: 'Әзірге өтініштер жоқ',
+      AppLanguage.en: 'No reports yet',
+    },
+    'admin_report_resolved': {
+      AppLanguage.ru: 'Решено',
+      AppLanguage.kz: 'Шешілді',
+      AppLanguage.en: 'Resolved',
+    },
+    'admin_report_open': {
+      AppLanguage.ru: 'Открыто',
+      AppLanguage.kz: 'Ашық',
+      AppLanguage.en: 'Open',
+    },
+
+    'admin_listings_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить объявления: {error}',
+      AppLanguage.kz: 'Хабарландыруларды жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load listings: {error}',
+    },
+    'admin_listings_filter_pending': {
+      AppLanguage.ru: 'На проверке',
+      AppLanguage.kz: 'Тексерілуде',
+      AppLanguage.en: 'Pending',
+    },
+    'admin_listings_filter_approved': {
+      AppLanguage.ru: 'Одобрено',
+      AppLanguage.kz: 'Мақұлданды',
+      AppLanguage.en: 'Approved',
+    },
+    'admin_listings_filter_rejected': {
+      AppLanguage.ru: 'Отклонено',
+      AppLanguage.kz: 'Қабылданбады',
+      AppLanguage.en: 'Rejected',
+    },
+    'admin_listings_filter_all': {
+      AppLanguage.ru: 'Все',
+      AppLanguage.kz: 'Барлығы',
+      AppLanguage.en: 'All',
+    },
+    'admin_listings_empty': {
+      AppLanguage.ru: 'Объявлений нет',
+      AppLanguage.kz: 'Хабарландырулар жоқ',
+      AppLanguage.en: 'No listings',
+    },
+    'admin_listings_no_name': {
+      AppLanguage.ru: 'Без имени',
+      AppLanguage.kz: 'Аты жоқ',
+      AppLanguage.en: 'No name',
+    },
+    'admin_listings_approve': {
+      AppLanguage.ru: 'Одобрить',
+      AppLanguage.kz: 'Мақұлдау',
+      AppLanguage.en: 'Approve',
+    },
+    'admin_listings_reject': {
+      AppLanguage.ru: 'Отклонить',
+      AppLanguage.kz: 'Қабылдамау',
+      AppLanguage.en: 'Reject',
+    },
+
+    'admin_stats_load_error': {
+      AppLanguage.ru: 'Не удалось загрузить статистику: {error}',
+      AppLanguage.kz: 'Статистиканы жүктеу мүмкін болмады: {error}',
+      AppLanguage.en: 'Failed to load statistics: {error}',
+    },
+    'admin_stats_active_zhk': {
+      AppLanguage.ru: 'Активных ЖК',
+      AppLanguage.kz: 'Белсенді ЖК',
+      AppLanguage.en: 'Active complexes',
+    },
+    'admin_stats_trashed_zhk': {
+      AppLanguage.ru: 'В корзине',
+      AppLanguage.kz: 'Себетте',
+      AppLanguage.en: 'In trash',
+    },
+    'admin_stats_total_users': {
+      AppLanguage.ru: 'Пользователей',
+      AppLanguage.kz: 'Пайдаланушылар',
+      AppLanguage.en: 'Users',
+    },
+    'admin_stats_subscribed_users': {
+      AppLanguage.ru: 'С подпиской',
+      AppLanguage.kz: 'Жазылымы барлар',
+      AppLanguage.en: 'Subscribed',
+    },
+    'admin_stats_open_reports': {
+      AppLanguage.ru: 'Открытых обращений',
+      AppLanguage.kz: 'Ашық өтініштер',
+      AppLanguage.en: 'Open reports',
+    },
+
+    // Админка — форма ЖК
+    'admin_zhk_photo_upload_error': {
+      AppLanguage.ru: 'Ошибка загрузки фото: {error}',
+      AppLanguage.kz: 'Фотоны жүктеу қатесі: {error}',
+      AppLanguage.en: 'Photo upload error: {error}',
+    },
+    'admin_zhk_save_error': {
+      AppLanguage.ru: 'Ошибка сохранения: {error}',
+      AppLanguage.kz: 'Сақтау қатесі: {error}',
+      AppLanguage.en: 'Save error: {error}',
+    },
+    'admin_zhk_photo_label': {AppLanguage.ru: 'Фото', AppLanguage.kz: 'Фото', AppLanguage.en: 'Photo'},
+    'admin_zhk_photo_uploading': {
+      AppLanguage.ru: 'Загрузка...',
+      AppLanguage.kz: 'Жүктелуде...',
+      AppLanguage.en: 'Uploading...',
+    },
+    'admin_zhk_photo_upload_button': {
+      AppLanguage.ru: 'Загрузить фото',
+      AppLanguage.kz: 'Фото жүктеу',
+      AppLanguage.en: 'Upload photo',
+    },
+    'admin_zhk_photo_url_label': {
+      AppLanguage.ru: 'Или ссылка на фото (URL)',
+      AppLanguage.kz: 'Немесе фото сілтемесі (URL)',
+      AppLanguage.en: 'Or a photo link (URL)',
+    },
+    'admin_zhk_edit_title': {
+      AppLanguage.ru: 'Редактировать ЖК',
+      AppLanguage.kz: 'ЖК өзгерту',
+      AppLanguage.en: 'Edit complex',
+    },
+    'admin_zhk_new_title': {
+      AppLanguage.ru: 'Новый ЖК',
+      AppLanguage.kz: 'Жаңа ЖК',
+      AppLanguage.en: 'New complex',
+    },
+    'admin_zhk_id_label': {
+      AppLanguage.ru: 'ID (уникальный, латиницей)',
+      AppLanguage.kz: 'ID (бірегей, латын әрпімен)',
+      AppLanguage.en: 'ID (unique, Latin letters)',
+    },
+    'admin_zhk_required_field': {
+      AppLanguage.ru: 'Обязательное поле',
+      AppLanguage.kz: 'Міндетті өріс',
+      AppLanguage.en: 'Required field',
+    },
+    'admin_zhk_name_label': {
+      AppLanguage.ru: 'Название',
+      AppLanguage.kz: 'Атауы',
+      AppLanguage.en: 'Name',
+    },
+    'admin_zhk_status_label': {
+      AppLanguage.ru: 'Статус',
+      AppLanguage.kz: 'Мәртебесі',
+      AppLanguage.en: 'Status',
+    },
+    'admin_zhk_developer_label': {
+      AppLanguage.ru: 'Застройщик',
+      AppLanguage.kz: 'Құрылысшы',
+      AppLanguage.en: 'Developer',
+    },
+    'admin_zhk_construction_label': {
+      AppLanguage.ru: 'Стройка (видно всем)',
+      AppLanguage.kz: 'Құрылыс (барлығына көрінеді)',
+      AppLanguage.en: 'Construction (visible to everyone)',
+    },
+    'admin_zhk_construction_unspecified': {
+      AppLanguage.ru: 'Не указано',
+      AppLanguage.kz: 'Көрсетілмеген',
+      AppLanguage.en: 'Not specified',
+    },
+    'admin_zhk_completion_year_label': {
+      AppLanguage.ru: 'Год сдачи',
+      AppLanguage.kz: 'Тапсыру жылы',
+      AppLanguage.en: 'Completion year',
+    },
+    'admin_zhk_lat_label': {
+      AppLanguage.ru: 'Широта (lat)',
+      AppLanguage.kz: 'Ендік (lat)',
+      AppLanguage.en: 'Latitude (lat)',
+    },
+    'admin_zhk_lng_label': {
+      AppLanguage.ru: 'Долгота (lng)',
+      AppLanguage.kz: 'Бойлық (lng)',
+      AppLanguage.en: 'Longitude (lng)',
+    },
+    'admin_zhk_details_section_title': {
+      AppLanguage.ru: 'Детали (видны только с подпиской)',
+      AppLanguage.kz: 'Толығырақ (тек жазылым бойынша көрінеді)',
+      AppLanguage.en: 'Details (visible with subscription only)',
     },
   };
 }

@@ -28,7 +28,7 @@ class AboutScreen extends StatelessWidget {
                   child: Icon(Icons.home_work_outlined, size: 36, color: colorScheme.onPrimaryContainer),
                 ),
                 const SizedBox(height: 12),
-                const Text('Шаңырақ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Shanyraq', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(context.tr('about_version'), style: const TextStyle(color: Colors.grey)),
               ],
