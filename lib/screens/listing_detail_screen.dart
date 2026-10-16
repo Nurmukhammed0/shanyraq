@@ -92,6 +92,10 @@ class ListingDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (!listing.isApproved) ...[
+                  _StatusBanner(listing: listing),
+                  const SizedBox(height: 14),
+                ],
                 if (listing.price != null)
                   Text(_formatPrice(listing.price),
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -185,4 +189,31 @@ class ListingDetailScreen extends StatelessWidget {
 
   String _formatArea(double area) =>
       area == area.roundToDouble() ? area.toInt().toString() : area.toStringAsFixed(1);
+}
+
+/// Баннер статуса модерации — виден только владельцу/админу (публике
+/// такие объявления вообще не видны по RLS).
+class _StatusBanner extends StatelessWidget {
+  final Listing listing;
+  const _StatusBanner({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, textKey, icon) = listing.isRejected
+        ? (const Color(0xFFE24B4A), 'listing_status_rejected', Icons.cancel_outlined)
+        : (Colors.orange.shade800, 'listing_status_pending', Icons.hourglass_top_rounded);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Text(context.tr(textKey), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+        ],
+      ),
+    );
+  }
 }

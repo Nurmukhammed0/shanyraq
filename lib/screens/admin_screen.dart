@@ -46,6 +46,13 @@ class AdminScreen extends StatelessWidget {
               ),
             ),
             MenuRow(
+              icon: Icons.home_work_outlined,
+              title: 'Объявления «Купить дом»',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const _ListingsScreen()),
+              ),
+            ),
+            MenuRow(
               icon: Icons.bar_chart_outlined,
               title: 'Статистика',
               onTap: () => Navigator.of(context).push(
@@ -768,6 +775,199 @@ class _ReportsScreenState extends State<_ReportsScreen> {
                         },
                       ),
                     ),
+    );
+  }
+}
+
+class _ListingsScreen extends StatefulWidget {
+  const _ListingsScreen();
+
+  @override
+  State<_ListingsScreen> createState() => _ListingsScreenState();
+}
+
+class _ListingsScreenState extends State<_ListingsScreen> {
+  List<Map<String, dynamic>> _rows = [];
+  bool _loading = true;
+  String? _error;
+  String _statusFilter = 'pending';
+
+  SupabaseClient get _client => Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      var query = _client.from('listings').select().filter('deleted_at', 'is', null);
+      if (_statusFilter != 'all') query = query.eq('status', _statusFilter);
+      final rows = await query.order('created_at', ascending: false);
+      if (!mounted) return;
+      setState(() {
+        _rows = List<Map<String, dynamic>>.from(rows as List);
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Не удалось загрузить объявления: $e';
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _setStatus(String id, String status) async {
+    try {
+      await _client.from('listings').update({'status': status}).eq('id', id);
+      _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(title: const Text('Объявления «Купить дом»')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: SizedBox(
+              height: 36,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final s in const [
+                    ('pending', 'На проверке'),
+                    ('approved', 'Одобрено'),
+                    ('rejected', 'Отклонено'),
+                    ('all', 'Все'),
+                  ])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(s.$2),
+                        selected: _statusFilter == s.$1,
+                        onSelected: (_) {
+                          setState(() => _statusFilter = s.$1);
+                          _load();
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
+                    : _rows.isEmpty
+                        ? const Center(child: Text('Объявлений нет'))
+                        : RefreshIndicator(
+                            onRefresh: _load,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              itemCount: _rows.length,
+                              itemBuilder: (context, i) {
+                                final r = _rows[i];
+                                final id = r['id'] as String;
+                                final status = r['status'] as String? ?? 'pending';
+                                final statusColor = switch (status) {
+                                  'approved' => const Color(0xFF22C55E),
+                                  'rejected' => const Color(0xFFE24B4A),
+                                  _ => Colors.orange.shade800,
+                                };
+                                final price = (r['price'] as num?)?.toInt();
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceVariant,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(r['title'] as String? ?? '',
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w700, fontSize: 14.5)),
+                                          ),
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: statusColor.withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(status,
+                                                style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: statusColor)),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      if (price != null)
+                                        Text('$price ₸', style: const TextStyle(fontSize: 13)),
+                                      Text(
+                                        [r['district'], r['address']]
+                                            .whereType<String>()
+                                            .join(', '),
+                                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                                      ),
+                                      Text(
+                                        '${r['contact_name'] ?? 'Без имени'} · ${r['phone'] ?? ''}',
+                                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                                      ),
+                                      const Divider(height: 18),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          if (status != 'approved')
+                                            TextButton.icon(
+                                              onPressed: () => _setStatus(id, 'approved'),
+                                              icon: const Icon(Icons.check_circle_outline, size: 16),
+                                              label: const Text('Одобрить'),
+                                              style: TextButton.styleFrom(
+                                                  foregroundColor: const Color(0xFF22C55E)),
+                                            ),
+                                          if (status != 'rejected')
+                                            TextButton.icon(
+                                              onPressed: () => _setStatus(id, 'rejected'),
+                                              icon: const Icon(Icons.cancel_outlined, size: 16),
+                                              label: const Text('Отклонить'),
+                                              style: TextButton.styleFrom(
+                                                  foregroundColor: const Color(0xFFE24B4A)),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+          ),
+        ],
+      ),
     );
   }
 }

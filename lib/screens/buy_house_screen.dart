@@ -11,6 +11,7 @@ import '../widgets/zhk_photo_thumbnail.dart';
 import 'listing_detail_screen.dart';
 import 'listing_edit_screen.dart';
 import 'login_screen.dart';
+import 'my_listings_screen.dart';
 import 'subscription_screen.dart';
 
 /// «Купить дом»: объявления, которые добавляют сами собственники
@@ -41,7 +42,7 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
       _error = null;
     });
     try {
-      final data = await _repo.fetchAll();
+      final data = await _repo.fetchApproved();
       if (!mounted) return;
       setState(() {
         _listings = data;
@@ -70,7 +71,22 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
     final created = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => const ListingEditScreen()),
     );
-    if (created == true) _load();
+    if (created == true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.tr('listing_submitted_pending'))));
+      }
+      _load();
+    }
+  }
+
+  Future<void> _openMyListings() async {
+    final auth = context.read<AuthService>();
+    if (!auth.isLoggedIn) {
+      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MyListingsScreen()));
   }
 
   @override
@@ -79,14 +95,23 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
     final profile = context.watch<ProfileService>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('home_buy_title'))),
+      appBar: AppBar(
+        title: Text(context.tr('home_buy_title')),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list_alt_outlined),
+            tooltip: context.tr('my_listings_title'),
+            onPressed: _openMyListings,
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text(context.tr('favorites_load_error', {'error': _error!})),
+                    child: Text(context.tr('buy_house_load_error', {'error': _error!})),
                   ),
                 )
               : RefreshIndicator(

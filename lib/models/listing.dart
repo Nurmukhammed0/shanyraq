@@ -16,6 +16,7 @@ class Listing {
   final String? contactName;
   final String? photoUrl;
   final DateTime? createdAt;
+  final String status; // 'pending' | 'approved' | 'rejected'
 
   const Listing({
     required this.id,
@@ -32,7 +33,12 @@ class Listing {
     this.contactName,
     this.photoUrl,
     this.createdAt,
+    this.status = 'pending',
   });
+
+  bool get isPending => status == 'pending';
+  bool get isApproved => status == 'approved';
+  bool get isRejected => status == 'rejected';
 
   factory Listing.fromJson(Map<String, dynamic> json) => Listing(
         id: json['id'] as String,
@@ -50,6 +56,7 @@ class Listing {
         photoUrl: json['photo_url'] as String?,
         createdAt:
             json['created_at'] != null ? DateTime.tryParse(json['created_at'] as String) : null,
+        status: json['status'] as String? ?? 'pending',
       );
 
   Map<String, dynamic> toInsertJson(String ownerId) => {

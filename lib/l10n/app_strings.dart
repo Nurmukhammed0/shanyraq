@@ -275,6 +275,41 @@ class AppStrings {
       AppLanguage.kz: 'Жариялау',
       AppLanguage.en: 'Publish',
     },
+    'listing_submitted_pending': {
+      AppLanguage.ru: 'Объявление отправлено на проверку модератору',
+      AppLanguage.kz: 'Хабарландыру модератордың тексеруіне жіберілді',
+      AppLanguage.en: 'Your listing has been submitted for review',
+    },
+    'listing_status_pending': {
+      AppLanguage.ru: 'На проверке',
+      AppLanguage.kz: 'Тексерілуде',
+      AppLanguage.en: 'Pending review',
+    },
+    'listing_status_approved': {
+      AppLanguage.ru: 'Одобрено',
+      AppLanguage.kz: 'Мақұлданды',
+      AppLanguage.en: 'Approved',
+    },
+    'listing_status_rejected': {
+      AppLanguage.ru: 'Отклонено',
+      AppLanguage.kz: 'Қабылданбады',
+      AppLanguage.en: 'Rejected',
+    },
+    'my_listings_title': {
+      AppLanguage.ru: 'Мои объявления',
+      AppLanguage.kz: 'Менің хабарландыруларым',
+      AppLanguage.en: 'My listings',
+    },
+    'my_listings_empty_title': {
+      AppLanguage.ru: 'У вас пока нет объявлений',
+      AppLanguage.kz: 'Сізде әзірге хабарландырулар жоқ',
+      AppLanguage.en: 'You have no listings yet',
+    },
+    'my_listings_empty_body': {
+      AppLanguage.ru: 'Добавьте объявление о продаже через кнопку в разделе «Купить дом».',
+      AppLanguage.kz: '«Үй сатып алу» бөліміндегі түйме арқылы сату хабарландыруын қосыңыз.',
+      AppLanguage.en: 'Add a listing from the button in the "Buy a home" section.',
+    },
     'zhk_list_empty_title': {
       AppLanguage.ru: 'Ничего не найдено',
       AppLanguage.kz: 'Ештеңе табылмады',
@@ -766,6 +801,11 @@ class AppStrings {
       AppLanguage.ru: 'Ошибка загрузки избранного: {error}',
       AppLanguage.kz: 'Таңдаулыны жүктеу қатесі: {error}',
       AppLanguage.en: 'Failed to load favorites: {error}',
+    },
+    'buy_house_load_error': {
+      AppLanguage.ru: 'Ошибка загрузки объявлений: {error}',
+      AppLanguage.kz: 'Хабарландыруларды жүктеу қатесі: {error}',
+      AppLanguage.en: 'Failed to load listings: {error}',
     },
 
     // Карточка ЖК — доп.
