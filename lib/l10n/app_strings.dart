@@ -332,10 +332,30 @@ class AppStrings {
       AppLanguage.kz: 'Сүзгілерді немесе іздеу сұрауын өзгертіп көріңіз.',
       AppLanguage.en: 'Try adjusting the filters or your search.',
     },
-    'zhk_list_city_almaty': {
+    'city_almaty': {
       AppLanguage.ru: 'Алматы',
       AppLanguage.kz: 'Алматы',
       AppLanguage.en: 'Almaty',
+    },
+    'city_astana': {
+      AppLanguage.ru: 'Астана',
+      AppLanguage.kz: 'Астана',
+      AppLanguage.en: 'Astana',
+    },
+    'city_shymkent': {
+      AppLanguage.ru: 'Шымкент',
+      AppLanguage.kz: 'Шымкент',
+      AppLanguage.en: 'Shymkent',
+    },
+    'city_picker_title': {
+      AppLanguage.ru: 'Город',
+      AppLanguage.kz: 'Қала',
+      AppLanguage.en: 'City',
+    },
+    'city_filter_all': {
+      AppLanguage.ru: 'Все города',
+      AppLanguage.kz: 'Барлық қалалар',
+      AppLanguage.en: 'All cities',
     },
     'home_ad_badge': {AppLanguage.ru: 'Реклама', AppLanguage.kz: 'Жарнама', AppLanguage.en: 'Ad'},
     'home_ad_stat': {
@@ -472,6 +492,46 @@ class AppStrings {
       AppLanguage.ru: 'Нет аккаунта? Зарегистрироваться',
       AppLanguage.kz: 'Аккаунтыңыз жоқ па? Тіркелу',
       AppLanguage.en: "Don't have an account? Sign up",
+    },
+    'login_forgot_password': {
+      AppLanguage.ru: 'Забыли пароль?',
+      AppLanguage.kz: 'Құпия сөзді ұмытып қалдыңыз ба?',
+      AppLanguage.en: 'Forgot password?',
+    },
+    'forgot_password_title': {
+      AppLanguage.ru: 'Восстановление пароля',
+      AppLanguage.kz: 'Құпия сөзді қалпына келтіру',
+      AppLanguage.en: 'Reset your password',
+    },
+    'forgot_password_subtitle': {
+      AppLanguage.ru: 'Укажите email, который вы использовали при регистрации — пришлём ссылку для восстановления пароля',
+      AppLanguage.kz: 'Тіркелу кезінде қолданған email мекенжайын енгізіңіз — құпия сөзді қалпына келтіру сілтемесін жібереміз',
+      AppLanguage.en: "Enter the email you signed up with — we'll send you a link to reset your password",
+    },
+    'forgot_password_submit': {
+      AppLanguage.ru: 'Отправить ссылку',
+      AppLanguage.kz: 'Сілтемені жіберу',
+      AppLanguage.en: 'Send reset link',
+    },
+    'forgot_password_sent_body': {
+      AppLanguage.ru: 'Если такой email зарегистрирован, на него отправлена ссылка для восстановления пароля. Проверьте почту, включая папку «Спам».',
+      AppLanguage.kz: 'Егер мұндай email тіркелген болса, оған құпия сөзді қалпына келтіру сілтемесі жіберілді. Поштаңызды, соның ішінде «Спам» қалтасын тексеріңіз.',
+      AppLanguage.en: 'If that email is registered, we\'ve sent a password reset link to it. Check your inbox, including spam.',
+    },
+    'forgot_password_back_to_login': {
+      AppLanguage.ru: 'Назад ко входу',
+      AppLanguage.kz: 'Кіруге оралу',
+      AppLanguage.en: 'Back to sign in',
+    },
+    'reset_password_title': {
+      AppLanguage.ru: 'Новый пароль',
+      AppLanguage.kz: 'Жаңа құпия сөз',
+      AppLanguage.en: 'Set a new password',
+    },
+    'reset_password_subtitle': {
+      AppLanguage.ru: 'Придумайте новый пароль для своего аккаунта',
+      AppLanguage.kz: 'Аккаунтыңыз үшін жаңа құпия сөз ойлап табыңыз',
+      AppLanguage.en: 'Choose a new password for your account',
     },
     'register_submit': {
       AppLanguage.ru: 'Зарегистрироваться',
@@ -1678,6 +1738,11 @@ class AppStrings {
       AppLanguage.ru: 'Статус',
       AppLanguage.kz: 'Мәртебесі',
       AppLanguage.en: 'Status',
+    },
+    'admin_zhk_city_label': {
+      AppLanguage.ru: 'Город',
+      AppLanguage.kz: 'Қала',
+      AppLanguage.en: 'City',
     },
     'admin_zhk_developer_label': {
       AppLanguage.ru: 'Застройщик',

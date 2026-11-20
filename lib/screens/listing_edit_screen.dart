@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
 import '../models/listing.dart';
 import '../services/listing_repository.dart';
 import '../services/profile_service.dart';
+import '../services/settings_service.dart';
 import '../widgets/responsive.dart';
 
 /// Форма добавления объявления собственником. Доступна только
@@ -32,6 +34,7 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
   final _contactName = TextEditingController();
   final _description = TextEditingController();
   String _photoUrl = '';
+  late String _city;
 
   bool _saving = false;
   bool _uploadingPhoto = false;
@@ -43,6 +46,8 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
     super.initState();
     final profile = context.read<ProfileService>();
     _contactName.text = profile.displayName ?? '';
+    // По умолчанию — город, который сейчас выбран в приложении.
+    _city = context.read<SettingsService>().city;
   }
 
   @override
@@ -90,7 +95,7 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
         ownerId: '',
         title: _title.text.trim(),
         price: double.tryParse(_price.text.trim().replaceAll(' ', '').replaceAll(',', '.')),
-        city: 'Алматы',
+        city: _city,
         district: _district.text.trim().isEmpty ? null : _district.text.trim(),
         address: _address.text.trim().isEmpty ? null : _address.text.trim(),
         rooms: int.tryParse(_rooms.text.trim()),
@@ -184,6 +189,15 @@ class _ListingEditScreenState extends State<ListingEditScreen> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _city,
+              decoration: InputDecoration(labelText: context.tr('admin_zhk_city_label')),
+              items: AppCity.all
+                  .map((c) => DropdownMenuItem(value: c, child: Text(context.tr(AppCity.labelKey(c)))))
+                  .toList(),
+              onChanged: (v) => setState(() => _city = v ?? AppCity.almaty),
             ),
             const SizedBox(height: 12),
             TextFormField(

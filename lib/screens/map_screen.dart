@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
 import '../models/zhk.dart';
 import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
@@ -19,9 +20,13 @@ import 'subscription_screen.dart';
 
 enum ZhkFilter { all, problematic, completedGuaranteed }
 
-// Примерный центр Алматы — используется, пока нет геокодированных
-// координат у части объектов.
-const _almatyCenter = LatLng(43.2220, 76.8512);
+// Примерные центры городов — используются для начального положения
+// карты при переключении города (а не координаты конкретных ЖК).
+const _cityCenters = <String, LatLng>{
+  AppCity.almaty: LatLng(43.2220, 76.8512),
+  AppCity.astana: LatLng(51.1694, 71.4491),
+  AppCity.shymkent: LatLng(42.3417, 69.5901),
+};
 
 class MapScreen extends StatefulWidget {
   // Заданы, когда карту открывают из списка ЖК с уже выбранными
@@ -125,10 +130,15 @@ class _MapScreenState extends State<MapScreen> {
     _refreshUnseenNotifications();
   }
 
+  List<Zhk> get _byCity {
+    final city = context.watch<SettingsService>().city;
+    return _all.where((z) => z.city == city).toList();
+  }
+
   List<Zhk> get _filtered {
     final isSubscribed = context.read<ProfileService>().isSubscribed;
     final effectiveFilter = isSubscribed ? _filter : ZhkFilter.all;
-    return _all.where((z) {
+    return _byCity.where((z) {
       final statusOk = switch (effectiveFilter) {
         ZhkFilter.all => true,
         ZhkFilter.problematic => z.status == 'problematic',
@@ -144,9 +154,45 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   List<String> get _districts {
-    final set = _all.map((e) => e.district).whereType<String>().toSet().toList();
+    final set = _byCity.map((e) => e.district).whereType<String>().toSet().toList();
     set.sort();
     return set;
+  }
+
+  Future<void> _openCitySheet() async {
+    final settings = context.read<SettingsService>();
+    final colorScheme = Theme.of(context).colorScheme;
+    await showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(context.tr('city_picker_title'),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            ),
+            for (final city in AppCity.all)
+              ListTile(
+                title: Text(context.tr(AppCity.labelKey(city))),
+                trailing: settings.city == city ? Icon(Icons.check, color: colorScheme.primary) : null,
+                onTap: () {
+                  settings.setCity(city);
+                  setState(() => _districtFilter = null);
+                  Navigator.pop(ctx);
+                  _mapController.move(_cityCenters[city] ?? _cityCenters[AppCity.almaty]!, 11);
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   void _openZhk(Zhk zhk) {
@@ -249,8 +295,9 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final profile = context.watch<ProfileService>();
     final auth = context.watch<AuthService>();
+    final city = context.watch<SettingsService>().city;
     final points = _filtered;
-    final withoutCoords = _all.where((z) => !z.hasCoordinates).length;
+    final withoutCoords = _byCity.where((z) => !z.hasCoordinates).length;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Esri Canvas (light/dark gray base) — обобщённая справочная подложка,
     // почти не обновляется для новых/неформальных районов на окраинах
@@ -270,7 +317,7 @@ class _MapScreenState extends State<MapScreen> {
                 FlutterMap(
                   mapController: _mapController,
                   options: MapOptions(
-                    initialCenter: _almatyCenter,
+                    initialCenter: _cityCenters[city] ?? _cityCenters[AppCity.almaty]!,
                     initialZoom: 11,
                     interactionOptions: const InteractionOptions(
                       // Поворот карты выключен: наши маркеры-капли не
@@ -528,11 +575,19 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildChipsRow(ProfileService profile) {
+    final city = context.watch<SettingsService>().city;
     return SizedBox(
       height: 36,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
+          _FilterChip(
+            label: context.tr(AppCity.labelKey(city)),
+            selected: true,
+            icon: Icons.expand_more,
+            onTap: _openCitySheet,
+          ),
+          const SizedBox(width: 8),
           _FilterChip(
             label: context.tr('filter_all'),
             selected: _filter == ZhkFilter.all,

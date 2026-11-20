@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
 import '../models/listing.dart';
 import '../services/auth_service.dart';
 import '../services/listing_repository.dart';
 import '../services/profile_service.dart';
+import '../services/settings_service.dart';
 import '../widgets/empty_state_illustration.dart';
 import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
@@ -90,6 +92,73 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const MyListingsScreen()));
   }
 
+  List<Listing> get _filtered {
+    final city = context.watch<SettingsService>().city;
+    return _listings.where((l) => l.city == city).toList();
+  }
+
+  Future<void> _openCitySheet() async {
+    final settings = context.read<SettingsService>();
+    final colorScheme = Theme.of(context).colorScheme;
+    await showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(context.tr('city_picker_title'),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            ),
+            for (final city in AppCity.all)
+              ListTile(
+                title: Text(context.tr(AppCity.labelKey(city))),
+                trailing: settings.city == city ? Icon(Icons.check, color: colorScheme.primary) : null,
+                onTap: () {
+                  settings.setCity(city);
+                  Navigator.pop(ctx);
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCityChip(BuildContext context) {
+    final city = context.watch<SettingsService>().city;
+    final colorScheme = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Material(
+        color: colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: _openCitySheet,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(context.tr(AppCity.labelKey(city)),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(width: 2),
+                Icon(Icons.expand_more, size: 16, color: colorScheme.onSurfaceVariant),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -150,15 +219,18 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
   }
 
   Widget _buildMobileBody(BuildContext context) {
+    final filtered = _filtered;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
       children: [
+        _buildCityChip(context),
+        const SizedBox(height: 12),
         _buildDisclaimer(context),
         const SizedBox(height: 16),
-        if (_listings.isEmpty)
+        if (filtered.isEmpty)
           _buildEmpty(context)
         else
-          ..._listings.map((l) => Padding(
+          ...filtered.map((l) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _ListingCard(listing: l),
               )),
@@ -171,13 +243,23 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
   // через слайверы (обычный GridView внутри ListView потребовал бы
   // shrinkWrap и терял бы ленивую отрисовку).
   Widget _buildDesktopBody(BuildContext context) {
+    final filtered = _filtered;
     return CustomScrollView(
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          sliver: SliverToBoxAdapter(child: _buildDisclaimer(context)),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCityChip(context),
+                const SizedBox(height: 12),
+                _buildDisclaimer(context),
+              ],
+            ),
+          ),
         ),
-        if (_listings.isEmpty)
+        if (filtered.isEmpty)
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             sliver: SliverToBoxAdapter(child: _buildEmpty(context)),
@@ -193,8 +275,8 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
                 mainAxisSpacing: 12,
               ),
               delegate: SliverChildBuilderDelegate(
-                (context, i) => _ListingCard(listing: _listings[i]),
-                childCount: _listings.length,
+                (context, i) => _ListingCard(listing: filtered[i]),
+                childCount: filtered.length,
               ),
             ),
           ),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../models/zhk.dart';
 import '../services/profile_service.dart';
+import '../services/settings_service.dart';
 import '../services/zhk_repository.dart';
 import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
@@ -43,10 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Чередуем проблемные/гарантийные объекты, чтобы превью на главной
-  // показывало разные ЖК, а не только один статус подряд.
+  // показывало разные ЖК, а не только один статус подряд. Только текущий
+  // город — иначе превью могло бы показать ЖК из города, который
+  // пользователь даже не выбирал.
   List<Zhk> get _catalogPreview {
-    final problematic = _all.where((z) => z.isProblematic).toList();
-    final guaranteed = _all.where((z) => !z.isProblematic).toList();
+    final city = context.watch<SettingsService>().city;
+    final byCity = _all.where((z) => z.city == city).toList();
+    final problematic = byCity.where((z) => z.isProblematic).toList();
+    final guaranteed = byCity.where((z) => !z.isProblematic).toList();
     final preview = <Zhk>[];
     var pi = 0, gi = 0;
     while (preview.length < 7 && (pi < problematic.length || gi < guaranteed.length)) {

@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/profile_service.dart';
 import 'app_shell.dart';
 import 'login_screen.dart';
+import 'reset_password_screen.dart';
 
 /// Без входа приложение вообще не показывается — сразу экран логина.
 /// Заблокированный админом пользователь тоже не проходит дальше.
@@ -16,6 +17,11 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
     if (!auth.isLoggedIn) return const LoginScreen();
+
+    // Пользователь перешёл по ссылке восстановления пароля из письма —
+    // Supabase уже выдал сессию, но внутрь приложения со старым паролем
+    // пускать рано: сначала нужно задать новый (см. AuthService).
+    if (auth.isPasswordRecovery) return const ResetPasswordScreen();
 
     final profile = context.watch<ProfileService>();
     if (profile.isBlocked) return const _BlockedScreen();

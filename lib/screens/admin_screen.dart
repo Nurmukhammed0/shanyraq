@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
 import '../widgets/grouped_list.dart';
 import '../widgets/responsive.dart';
 import 'admin_zhk_edit_screen.dart';
@@ -419,6 +420,9 @@ class _ZhkScreenState extends State<_ZhkScreen> {
   List<Map<String, dynamic>> _rows = [];
   bool _loading = true;
   String? _error;
+  // null = все города — админ управляет реестром сразу по всем городам,
+  // в отличие от публичного списка/карты, где всегда выбран один.
+  String? _cityFilter;
 
   SupabaseClient get _client => Supabase.instance.client;
 
@@ -487,9 +491,53 @@ class _ZhkScreenState extends State<_ZhkScreen> {
     if (changed == true) _load();
   }
 
+  List<Map<String, dynamic>> get _filteredRows {
+    if (_cityFilter == null) return _rows;
+    return _rows.where((r) => (r['city'] as String? ?? AppCity.almaty) == _cityFilter).toList();
+  }
+
+  Widget _buildCityFilterRow(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    Widget chip(String? city, String label) {
+      final selected = _cityFilter == city;
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: Material(
+          color: selected ? colorScheme.primary : colorScheme.surfaceVariant,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => setState(() => _cityFilter = city),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Text(label,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: selected ? colorScheme.onPrimary : colorScheme.onSurface)),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 36,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        children: [
+          chip(null, context.tr('city_filter_all')),
+          for (final city in AppCity.all) chip(city, context.tr(AppCity.labelKey(city))),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final rows = _filteredRows;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('admin_zhk_objects'))),
       body: DesktopConstrained(
@@ -498,42 +546,56 @@ class _ZhkScreenState extends State<_ZhkScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!)))
-              : RefreshIndicator(
-                  onRefresh: _load,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _rows.length,
-                    itemBuilder: (context, i) {
-                      final r = _rows[i];
-                      final isProblematic = r['status'] == 'problematic';
-                      final color = isProblematic ? const Color(0xFFE24B4A) : const Color(0xFF22C55E);
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant,
-                          borderRadius: BorderRadius.circular(14),
+              : Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    _buildCityFilterRow(context),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _load,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: rows.length,
+                          itemBuilder: (context, i) {
+                            final r = rows[i];
+                            final isProblematic = r['status'] == 'problematic';
+                            final color = isProblematic ? const Color(0xFFE24B4A) : const Color(0xFF22C55E);
+                            final city = r['city'] as String? ?? AppCity.almaty;
+                            final subtitle = [context.tr(AppCity.labelKey(city)), r['address'] as String?]
+                                .whereType<String>()
+                                .join(' · ');
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceVariant,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: ListTile(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration:
+                                      BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+                                  child: Icon(Icons.location_on, color: color, size: 18),
+                                ),
+                                title: Text(r['name'] as String? ?? '',
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+                                onTap: () => _openEdit(r),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  tooltip: context.tr('admin_zhk_trash_button'),
+                                  onPressed: () => _moveToTrash(r['id'] as String, r['name'] as String? ?? ''),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        child: ListTile(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          leading: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
-                            child: Icon(Icons.location_on, color: color, size: 18),
-                          ),
-                          title: Text(r['name'] as String? ?? '',
-                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                          subtitle: Text(r['address'] as String? ?? '', style: const TextStyle(fontSize: 12)),
-                          onTap: () => _openEdit(r),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline),
-                            tooltip: context.tr('admin_zhk_trash_button'),
-                            onPressed: () => _moveToTrash(r['id'] as String, r['name'] as String? ?? ''),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
       ),
       floatingActionButton: FloatingActionButton(

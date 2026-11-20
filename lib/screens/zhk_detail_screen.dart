@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
 import '../models/zhk.dart';
 import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
@@ -164,6 +165,7 @@ class ZhkDetailScreen extends StatelessWidget {
                 Text(zhk.name,
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.2)),
                 const SizedBox(height: 12),
+                _InfoRow(icon: Icons.location_city_outlined, text: context.tr(AppCity.labelKey(zhk.city))),
                 _InfoRow(icon: Icons.map_outlined, text: zhk.district),
                 _InfoRow(icon: Icons.location_on_outlined, text: zhk.address),
                 _InfoRow(icon: Icons.apartment_outlined, text: zhk.developer),

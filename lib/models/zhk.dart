@@ -3,6 +3,7 @@
 class Zhk {
   final String id;
   final String name;
+  final String city;
   final String? district;
   final String? address;
   final String? developer;
@@ -24,6 +25,7 @@ class Zhk {
     required this.id,
     required this.name,
     required this.status,
+    this.city = 'Алматы',
     this.district,
     this.address,
     this.developer,
@@ -48,6 +50,7 @@ class Zhk {
       id: json['id'] as String,
       name: json['name'] as String,
       status: json['status'] as String? ?? 'problematic',
+      city: json['city'] as String? ?? 'Алматы',
       district: json['district'] as String?,
       address: json['address'] as String?,
       developer: json['developer'] as String?,
@@ -68,6 +71,7 @@ class Zhk {
         'id': id,
         'name': name,
         'status': status,
+        'city': city,
         'district': district,
         'address': address,
         'developer': developer,

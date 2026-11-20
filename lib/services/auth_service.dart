@@ -4,8 +4,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// Обёртка над Supabase Auth: логин, регистрация, выход,
 /// текущий пользователь как ChangeNotifier для UI.
 class AuthService extends ChangeNotifier {
+  // true между моментом, когда пользователь переходит по ссылке
+  // восстановления пароля из письма, и моментом, когда он сохранит новый
+  // пароль. Supabase в этот момент уже выдаёт валидную сессию (иначе
+  // updateUser не сработал бы), поэтому одного isLoggedIn недостаточно —
+  // AuthGate должен отличить "восстановление пароля" от обычного входа,
+  // чтобы не пустить человека в приложение со старым паролем, который он
+  // только что пытался сбросить.
+  bool _isPasswordRecovery = false;
+  bool get isPasswordRecovery => _isPasswordRecovery;
+
   AuthService() {
-    Supabase.instance.client.auth.onAuthStateChange.listen((_) {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.passwordRecovery) {
+        _isPasswordRecovery = true;
+      }
       notifyListeners();
     });
   }
@@ -14,6 +27,13 @@ class AuthService extends ChangeNotifier {
 
   User? get currentUser => _client.auth.currentUser;
   bool get isLoggedIn => currentUser != null;
+
+  /// Вызывается после того, как пользователь сохранил новый пароль по
+  /// ссылке восстановления — пускает его дальше в обычный AppShell.
+  void clearPasswordRecovery() {
+    _isPasswordRecovery = false;
+    notifyListeners();
+  }
 
   Future<String?> signUp({required String email, required String password}) async {
     try {
@@ -39,6 +59,24 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _client.auth.signOut();
+  }
+
+  /// Отправляет письмо со ссылкой для восстановления пароля. Не
+  /// раскрывает, зарегистрирован ли такой email — Supabase возвращает
+  /// успех в обоих случаях, так что сообщение пользователю всегда одно
+  /// и то же (экран ForgotPasswordScreen сам решает, что показать).
+  Future<String?> resetPasswordForEmail(String email) async {
+    try {
+      await _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: kIsWeb ? null : 'io.supabase.shanyraq://login-callback',
+      );
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'Не удалось отправить письмо: $e';
+    }
   }
 
   /// Вход/регистрация через Google. Результат наблюдается через

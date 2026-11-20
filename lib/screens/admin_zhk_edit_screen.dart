@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
+import '../models/app_city.dart';
+import '../services/settings_service.dart';
 import '../widgets/responsive.dart';
 
 /// Форма создания/редактирования объекта ЖК. Если [existing] передан —
@@ -37,12 +40,22 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
 
   late String _status = widget.existing?['status'] as String? ?? 'problematic';
   late String? _constructionStatus = widget.existing?['construction_status'] as String?;
+  late String _city;
   bool _saving = false;
   bool _uploadingPhoto = false;
 
   bool get _isEditing => widget.existing?['id'] != null;
 
   SupabaseClient get _client => Supabase.instance.client;
+
+  @override
+  void initState() {
+    super.initState();
+    // Новый объект — по умолчанию берём город, который сейчас выбран в
+    // приложении (админ обычно добавляет ЖК, уже просматривая этот город
+    // на карте/в списке); при редактировании — город из записи.
+    _city = widget.existing?['city'] as String? ?? context.read<SettingsService>().city;
+  }
 
   @override
   void dispose() {
@@ -104,6 +117,7 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
       final payload = {
         'id': _id.text.trim(),
         'name': _name.text.trim(),
+        'city': _city,
         'district': _nullIfEmpty(_district.text),
         'address': _nullIfEmpty(_address.text),
         'developer': _nullIfEmpty(_developer.text),
@@ -214,6 +228,15 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
                     value: 'completed_guaranteed', child: Text(context.tr('zhk_status_guaranteed'))),
               ],
               onChanged: (v) => setState(() => _status = v ?? 'problematic'),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _city,
+              decoration: InputDecoration(labelText: context.tr('admin_zhk_city_label')),
+              items: AppCity.all
+                  .map((c) => DropdownMenuItem(value: c, child: Text(context.tr(AppCity.labelKey(c)))))
+                  .toList(),
+              onChanged: (v) => setState(() => _city = v ?? AppCity.almaty),
             ),
             const SizedBox(height: 12),
             TextFormField(
