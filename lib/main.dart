@@ -33,6 +33,13 @@ Future<void> main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    // PKCE (дефолт) хранит секрет обмена кода на сессию в localStorage
+    // ТОГО браузера, где был запрошен сброс пароля — а письмо почти
+    // всегда открывают в другом браузере/на другом устройстве, и обмен
+    // там молча проваливается (сессия просто не создаётся, без ошибки).
+    // Implicit-флоу кладёт access_token прямо в ссылку — работает
+    // независимо от того, где её открыли.
+    authOptions: const FlutterAuthClientOptions(authFlowType: AuthFlowType.implicit),
   );
 
   runApp(AlmatyZhkApp(initialPasswordRecovery: isPasswordRecoveryLink));
