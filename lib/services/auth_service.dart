@@ -65,11 +65,20 @@ class AuthService extends ChangeNotifier {
   /// раскрывает, зарегистрирован ли такой email — Supabase возвращает
   /// успех в обоих случаях, так что сообщение пользователю всегда одно
   /// и то же (экран ForgotPasswordScreen сам решает, что показать).
+  ///
+  /// redirectTo для веба указан явно (а не null): когда он не передан,
+  /// supabase_flutter сам подставляет origin текущей страницы БЕЗ пути
+  /// (https://nurmukhammed0.github.io/, а не .../shanyraq/) — Site URL,
+  /// настроенный в панели Supabase, в этот расчёт не попадает. Из-за
+  /// этого ссылка в письме вела на несуществующую страницу (404 от
+  /// GitHub Pages) независимо от того, что указано в дашборде.
   Future<String?> resetPasswordForEmail(String email) async {
     try {
       await _client.auth.resetPasswordForEmail(
         email,
-        redirectTo: kIsWeb ? null : 'io.supabase.shanyraq://login-callback',
+        redirectTo: kIsWeb
+            ? 'https://nurmukhammed0.github.io/shanyraq/'
+            : 'io.supabase.shanyraq://login-callback',
       );
       return null;
     } on AuthException catch (e) {
