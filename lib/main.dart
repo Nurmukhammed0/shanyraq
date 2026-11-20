@@ -19,22 +19,35 @@ const supabaseAnonKey = 'sb_publishable_wEtzUYeEoj5yu1MygQK7kQ_Q7-hoyrD';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Считываем URL до Supabase.initialize(), а не полагаемся только на
+  // событие AuthChangeEvent.passwordRecovery из onAuthStateChange: GoTrue
+  // обрабатывает ссылку восстановления (и эмитит это событие) уже во
+  // время самой инициализации, а AuthService подписывается на поток
+  // только после неё — событие успевает улететь до того, как кто-либо
+  // начал слушать (onAuthStateChange — broadcast-поток без повтора
+  // пропущенных событий). URL — самостоятельный источник истины.
+  final initialUri = Uri.base;
+  final isPasswordRecoveryLink =
+      initialUri.queryParameters['type'] == 'recovery' || initialUri.fragment.contains('type=recovery');
+
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
   );
 
-  runApp(const AlmatyZhkApp());
+  runApp(AlmatyZhkApp(initialPasswordRecovery: isPasswordRecoveryLink));
 }
 
 class AlmatyZhkApp extends StatelessWidget {
-  const AlmatyZhkApp({super.key});
+  final bool initialPasswordRecovery;
+  const AlmatyZhkApp({super.key, this.initialPasswordRecovery = false});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(
+            create: (_) => AuthService(initialPasswordRecovery: initialPasswordRecovery)),
         ChangeNotifierProvider(create: (_) => FavoritesService()..load()),
         ChangeNotifierProvider(create: (_) => ProfileService()),
         ChangeNotifierProvider(create: (_) => SettingsService()),

@@ -533,6 +533,11 @@ class AppStrings {
       AppLanguage.kz: 'Аккаунтыңыз үшін жаңа құпия сөз ойлап табыңыз',
       AppLanguage.en: 'Choose a new password for your account',
     },
+    'password_recovery_timeout': {
+      AppLanguage.ru: 'Не удалось подтвердить ссылку восстановления — возможно, она устарела или уже использована. Запросите новую.',
+      AppLanguage.kz: 'Қалпына келтіру сілтемесін растау мүмкін болмады — мүмкін, ол ескірген немесе бұрын қолданылған. Жаңасын сұраңыз.',
+      AppLanguage.en: "Couldn't confirm the reset link — it may be expired or already used. Please request a new one.",
+    },
     'register_submit': {
       AppLanguage.ru: 'Зарегистрироваться',
       AppLanguage.kz: 'Тіркелу',

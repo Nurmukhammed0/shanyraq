@@ -11,10 +11,14 @@ class AuthService extends ChangeNotifier {
   // AuthGate должен отличить "восстановление пароля" от обычного входа,
   // чтобы не пустить человека в приложение со старым паролем, который он
   // только что пытался сбросить.
-  bool _isPasswordRecovery = false;
+  bool _isPasswordRecovery;
   bool get isPasswordRecovery => _isPasswordRecovery;
 
-  AuthService() {
+  // initialPasswordRecovery приходит из main() — разобран из URL ещё до
+  // Supabase.initialize(), на случай если сам passwordRecovery-эвент SDK
+  // уже улетел мимо (см. комментарий в main.dart). Событие ниже оставлено
+  // как дополнительный путь — не единственный.
+  AuthService({bool initialPasswordRecovery = false}) : _isPasswordRecovery = initialPasswordRecovery {
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.passwordRecovery) {
         _isPasswordRecovery = true;
