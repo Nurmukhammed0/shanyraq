@@ -884,6 +884,8 @@ class _ListingsScreenState extends State<_ListingsScreen> {
   bool _loading = true;
   String? _error;
   String _statusFilter = 'pending';
+  // null = все города — как и в _ZhkScreen, админ модерирует сразу всё.
+  String? _cityFilter;
 
   SupabaseClient get _client => Supabase.instance.client;
 
@@ -901,6 +903,7 @@ class _ListingsScreenState extends State<_ListingsScreen> {
     try {
       var query = _client.from('listings').select().filter('deleted_at', 'is', null);
       if (_statusFilter != 'all') query = query.eq('status', _statusFilter);
+      if (_cityFilter != null) query = query.eq('city', _cityFilter!);
       final rows = await query.order('created_at', ascending: false);
       if (!mounted) return;
       setState(() {
@@ -957,6 +960,40 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                         selected: _statusFilter == s.$1,
                         onSelected: (_) {
                           setState(() => _statusFilter = s.$1);
+                          _load();
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SizedBox(
+              height: 36,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(context.tr('city_filter_all')),
+                      selected: _cityFilter == null,
+                      onSelected: (_) {
+                        setState(() => _cityFilter = null);
+                        _load();
+                      },
+                    ),
+                  ),
+                  for (final city in AppCity.all)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(context.tr(AppCity.labelKey(city))),
+                        selected: _cityFilter == city,
+                        onSelected: (_) {
+                          setState(() => _cityFilter = city);
                           _load();
                         },
                       ),
@@ -1031,9 +1068,11 @@ class _ListingsScreenState extends State<_ListingsScreen> {
                                       if (price != null)
                                         Text('$price ₸', style: const TextStyle(fontSize: 13)),
                                       Text(
-                                        [r['district'], r['address']]
-                                            .whereType<String>()
-                                            .join(', '),
+                                        [
+                                          context.tr(AppCity.labelKey(r['city'] as String? ?? AppCity.almaty)),
+                                          r['district'],
+                                          r['address'],
+                                        ].whereType<String>().join(', '),
                                         style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                       ),
                                       Text(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,20 +18,43 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  // Встроенный email-сервис Supabase имеет жёсткий часовой лимит писем
+  // (см. §11 PRD) — кулдаун не даёт случайно выжечь его повторными
+  // нажатиями «отправить ещё раз» за несколько секунд.
+  static const _resendCooldown = 60;
+
   final _emailController = TextEditingController();
   bool _loading = false;
   bool _sent = false;
   String? _error;
+  int _cooldownSeconds = 0;
+  Timer? _cooldownTimer;
 
   @override
   void dispose() {
     _emailController.dispose();
+    _cooldownTimer?.cancel();
     super.dispose();
+  }
+
+  void _startCooldown() {
+    _cooldownTimer?.cancel();
+    setState(() => _cooldownSeconds = _resendCooldown);
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _cooldownSeconds--;
+        if (_cooldownSeconds <= 0) timer.cancel();
+      });
+    });
   }
 
   Future<void> _submit() async {
     final email = _emailController.text.trim();
-    if (email.isEmpty) return;
+    if (email.isEmpty || _loading || _cooldownSeconds > 0) return;
     setState(() {
       _loading = true;
       _error = null;
@@ -41,6 +66,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       _error = error;
       if (error == null) _sent = true;
     });
+    if (error == null) _startCooldown();
   }
 
   @override
@@ -73,9 +99,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant, height: 1.4),
                   ),
                   const SizedBox(height: 28),
-                  if (_sent)
-                    Icon(Icons.mark_email_read_outlined, size: 56, color: colorScheme.primary)
-                  else ...[
+                  if (_sent) ...[
+                    Icon(Icons.mark_email_read_outlined, size: 56, color: colorScheme.primary),
+                    const SizedBox(height: 24),
+                    TextButton(
+                      onPressed: _loading || _cooldownSeconds > 0 ? null : _submit,
+                      child: _loading
+                          ? const SizedBox(
+                              height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                          : Text(_cooldownSeconds > 0
+                              ? context.tr('forgot_password_resend_cooldown', {'n': '$_cooldownSeconds'})
+                              : context.tr('forgot_password_resend')),
+                    ),
+                  ] else ...[
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -92,7 +128,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ],
                     const SizedBox(height: 24),
                     FilledButton(
-                      onPressed: _loading ? null : _submit,
+                      onPressed: _loading || _cooldownSeconds > 0 ? null : _submit,
                       style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
                       child: _loading
                           ? const SizedBox(
@@ -100,7 +136,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               width: 18,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
-                          : Text(context.tr('forgot_password_submit')),
+                          : Text(_cooldownSeconds > 0
+                              ? context.tr('forgot_password_resend_cooldown', {'n': '$_cooldownSeconds'})
+                              : context.tr('forgot_password_submit')),
                     ),
                   ],
                   const SizedBox(height: 16),

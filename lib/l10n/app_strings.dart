@@ -523,6 +523,16 @@ class AppStrings {
       AppLanguage.kz: 'Кіруге оралу',
       AppLanguage.en: 'Back to sign in',
     },
+    'forgot_password_resend': {
+      AppLanguage.ru: 'Отправить письмо ещё раз',
+      AppLanguage.kz: 'Хатты қайта жіберу',
+      AppLanguage.en: 'Resend the email',
+    },
+    'forgot_password_resend_cooldown': {
+      AppLanguage.ru: 'Повторить можно через {n} с',
+      AppLanguage.kz: '{n} секундтан кейін қайталауға болады',
+      AppLanguage.en: 'You can resend in {n}s',
+    },
     'reset_password_title': {
       AppLanguage.ru: 'Новый пароль',
       AppLanguage.kz: 'Жаңа құпия сөз',
