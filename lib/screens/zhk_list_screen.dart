@@ -144,16 +144,25 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
     );
   }
 
-  // Статус и район — в одной шторке вместо вечно открытой строки чипов
-  // (как в крупных приложениях: кнопка "Фильтры" -> панель -> "Показать").
-  // Выбор внутри шторки черновой (локальные _localFilter/_localDistrict
-  // через setSheetState) и применяется одним махом по кнопке снизу —
-  // не на каждый тап, чтобы не дёргать список туда-сюда, пока человек
-  // ещё выбирает.
+  String _statusLabel(ZhkFilter f) => switch (f) {
+        ZhkFilter.all => context.tr('filter_all'),
+        ZhkFilter.problematic => context.tr('filter_problematic'),
+        ZhkFilter.completedGuaranteed => context.tr('filter_guaranteed'),
+      };
+
+  // Двухуровневая шторка: сначала список категорий (Статус, Район) с
+  // текущим значением и стрелкой, тап по категории проваливается в её
+  // список вариантов с кнопкой "назад". Плоский список с обеими секциями
+  // сразу (первая версия) переставал влезать на глаз, как только
+  // появилась вторая секция — а дальше будут ещё категории фильтров.
+  // Выбор черновой (localFilter/localDistrict), применяется разом по
+  // кнопке "Показать" на корневом экране шторки.
   Future<void> _openFiltersSheet() async {
     final profile = context.read<ProfileService>();
     var localFilter = _filter;
     var localDistrict = _districtFilter;
+    // null — корневой список категорий; 'status' / 'district' — внутри категории.
+    String? openCategory;
 
     await showModalBottomSheet(
       context: context,
@@ -170,6 +179,40 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
             final matchCount = _byCity
                 .where((z) => _matches(z, filter: effectiveLocalFilter, district: localDistrict))
                 .length;
+
+            Widget categoryRow({required String title, required String value, required VoidCallback onTap}) {
+              return ListTile(
+                title: Text(title),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 160),
+                      child: Text(value,
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                    ),
+                    Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+                  ],
+                ),
+                onTap: onTap,
+              );
+            }
+
+            Widget categoryHeader(String title) => Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 0, 20, 4),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => setSheetState(() => openCategory = null),
+                      ),
+                      Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+                    ],
+                  ),
+                );
 
             Widget statusTile({
               required ZhkFilter value,
@@ -195,12 +238,16 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
                         Navigator.pop(ctx);
                         _openSubscription();
                       }
-                    : () => setSheetState(() => localFilter = value),
+                    : () => setSheetState(() {
+                          localFilter = value;
+                          openCategory = null;
+                        }),
               );
             }
 
-            return SafeArea(
-              child: Column(
+            Widget buildRoot() {
+              return Column(
+                key: const ValueKey('root'),
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
@@ -220,52 +267,18 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
                       ],
                     ),
                   ),
-                  Flexible(
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
-                          child: Text(context.tr('filters_status_section'),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 12.5, color: colorScheme.onSurfaceVariant)),
-                        ),
-                        statusTile(value: ZhkFilter.all, label: context.tr('filter_all')),
-                        statusTile(
-                          value: ZhkFilter.problematic,
-                          label: context.tr('filter_problematic'),
-                          dotColor: const Color(0xFFE24B4A),
-                          locked: !profile.isSubscribed,
-                        ),
-                        statusTile(
-                          value: ZhkFilter.completedGuaranteed,
-                          label: context.tr('filter_guaranteed'),
-                          dotColor: const Color(0xFF22C55E),
-                          locked: !profile.isSubscribed,
-                        ),
-                        const Divider(height: 24),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
-                          child: Text(context.tr('filter_district_hint'),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 12.5, color: colorScheme.onSurfaceVariant)),
-                        ),
-                        ListTile(
-                          title: Text(context.tr('filter_district_all')),
-                          trailing:
-                              localDistrict == null ? Icon(Icons.check, color: colorScheme.primary) : null,
-                          onTap: () => setSheetState(() => localDistrict = null),
-                        ),
-                        ..._districts.map((d) => ListTile(
-                              title: Text(d),
-                              trailing:
-                                  localDistrict == d ? Icon(Icons.check, color: colorScheme.primary) : null,
-                              onTap: () => setSheetState(() => localDistrict = d),
-                            )),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
+                  categoryRow(
+                    title: context.tr('filters_status_section'),
+                    value: _statusLabel(localFilter),
+                    onTap: () => setSheetState(() => openCategory = 'status'),
                   ),
+                  const Divider(height: 1),
+                  categoryRow(
+                    title: context.tr('filter_district_hint'),
+                    value: localDistrict ?? context.tr('filter_district_all'),
+                    onTap: () => setSheetState(() => openCategory = 'district'),
+                  ),
+                  const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                     child: FilledButton(
@@ -281,6 +294,84 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
                     ),
                   ),
                 ],
+              );
+            }
+
+            Widget buildStatusCategory() {
+              return Column(
+                key: const ValueKey('status'),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  categoryHeader(context.tr('filters_status_section')),
+                  statusTile(value: ZhkFilter.all, label: context.tr('filter_all')),
+                  statusTile(
+                    value: ZhkFilter.problematic,
+                    label: context.tr('filter_problematic'),
+                    dotColor: const Color(0xFFE24B4A),
+                    locked: !profile.isSubscribed,
+                  ),
+                  statusTile(
+                    value: ZhkFilter.completedGuaranteed,
+                    label: context.tr('filter_guaranteed'),
+                    dotColor: const Color(0xFF22C55E),
+                    locked: !profile.isSubscribed,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              );
+            }
+
+            Widget buildDistrictCategory() {
+              return Column(
+                key: const ValueKey('district'),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  categoryHeader(context.tr('filter_district_hint')),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        ListTile(
+                          title: Text(context.tr('filter_district_all')),
+                          trailing:
+                              localDistrict == null ? Icon(Icons.check, color: colorScheme.primary) : null,
+                          onTap: () => setSheetState(() {
+                            localDistrict = null;
+                            openCategory = null;
+                          }),
+                        ),
+                        ..._districts.map((d) => ListTile(
+                              title: Text(d),
+                              trailing:
+                                  localDistrict == d ? Icon(Icons.check, color: colorScheme.primary) : null,
+                              onTap: () => setSheetState(() {
+                                localDistrict = d;
+                                openCategory = null;
+                              }),
+                            )),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return SafeArea(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(begin: const Offset(0.05, 0), end: Offset.zero).animate(animation),
+                    child: child,
+                  ),
+                ),
+                child: switch (openCategory) {
+                  'status' => buildStatusCategory(),
+                  'district' => buildDistrictCategory(),
+                  _ => buildRoot(),
+                },
               ),
             );
           },
