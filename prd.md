@@ -222,6 +222,19 @@ functions (never raw client-side updates to other users' rows) to avoid privileg
 `set_own_auto_renew`, `delete_own_account`, `admin_set_blocked`, `admin_delete_user`,
 `admin-create-user` (Edge Function).
 
+**`zhk_public` view (column-level paywall enforcement).** RLS controls row visibility, not column
+visibility — the `zhk_read_all` policy (`using (true)`) lets anyone, including anonymous unauthenticated
+clients, `select *` from `zhk` over the REST API directly, bypassing the app UI entirely. Since the
+subscription gate on `documentation`/`tech_status`/`violations`/`measures`/`court` (§7.1, §7.2) was
+originally enforced only in the Flutter widgets, that meant anyone who inspected network traffic (or just
+read the public anon key out of the client bundle — expected/normal for Supabase, not itself a bug) could
+fetch the full paid dataset for free, no subscription required. `zhk_public` (see
+`supabase/zhk_public_view.sql`) is a `security_invoker` view that nulls out those five columns unless
+`profiles.is_subscribed` is true for the requesting user; `ZhkRepository.fetchFromSupabase()` (the read
+path used by the documents list, map, home catalog, and favorites) reads this view instead of the base
+table. Admin writes still go straight to `zhk` (unaffected, already gated by the existing
+admin-only INSERT/UPDATE/DELETE policies); only the public **read** path changed.
+
 ## 9. Explicitly out of scope / deliberate exclusions
 
 - **No scraping or aggregating third-party listing data** (Krisha.kz, OLX, 2GIS, or anyone else).
