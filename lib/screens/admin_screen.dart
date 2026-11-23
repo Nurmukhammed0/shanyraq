@@ -724,7 +724,14 @@ class _TrashScreenState extends State<_TrashScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                                      Text(r['address'] as String? ?? '', style: const TextStyle(fontSize: 12)),
+                                      Text(
+                                        [
+                                          context.tr(
+                                              AppCity.labelKey(r['city'] as String? ?? AppCity.almaty)),
+                                          r['address'] as String?,
+                                        ].whereType<String>().join(', '),
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -775,8 +782,10 @@ class _ReportsScreenState extends State<_ReportsScreen> {
       _error = null;
     });
     try {
-      final rows =
-          await _client.from('zhk_reports').select('*, zhk:zhk_id(name)').order('created_at', ascending: false);
+      final rows = await _client
+          .from('zhk_reports')
+          .select('*, zhk:zhk_id(name, city)')
+          .order('created_at', ascending: false);
       if (!mounted) return;
       setState(() {
         _rows = List<Map<String, dynamic>>.from(rows as List);
@@ -817,7 +826,9 @@ class _ReportsScreenState extends State<_ReportsScreen> {
                         itemBuilder: (context, i) {
                           final r = _rows[i];
                           final id = r['id'] as String;
-                          final zhkName = (r['zhk'] as Map?)?['name'] as String? ?? r['zhk_id'] as String? ?? '';
+                          final zhk = r['zhk'] as Map?;
+                          final zhkName = zhk?['name'] as String? ?? r['zhk_id'] as String? ?? '';
+                          final zhkCity = zhk?['city'] as String? ?? AppCity.almaty;
                           final resolved = r['status'] == 'resolved';
                           return Container(
                             margin: const EdgeInsets.only(bottom: 10),
@@ -834,6 +845,8 @@ class _ReportsScreenState extends State<_ReportsScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(zhkName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                                      Text(context.tr(AppCity.labelKey(zhkCity)),
+                                          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant)),
                                       const SizedBox(height: 4),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
