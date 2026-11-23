@@ -223,17 +223,33 @@ functions (never raw client-side updates to other users' rows) to avoid privileg
 `admin-create-user` (Edge Function).
 
 **`zhk_public` view (column-level paywall enforcement).** RLS controls row visibility, not column
-visibility — the `zhk_read_all` policy (`using (true)`) lets anyone, including anonymous unauthenticated
-clients, `select *` from `zhk` over the REST API directly, bypassing the app UI entirely. Since the
-subscription gate on `documentation`/`tech_status`/`violations`/`measures`/`court` (§7.1, §7.2) was
-originally enforced only in the Flutter widgets, that meant anyone who inspected network traffic (or just
-read the public anon key out of the client bundle — expected/normal for Supabase, not itself a bug) could
-fetch the full paid dataset for free, no subscription required. `zhk_public` (see
-`supabase/zhk_public_view.sql`) is a `security_invoker` view that nulls out those five columns unless
-`profiles.is_subscribed` is true for the requesting user; `ZhkRepository.fetchFromSupabase()` (the read
-path used by the documents list, map, home catalog, and favorites) reads this view instead of the base
-table. Admin writes still go straight to `zhk` (unaffected, already gated by the existing
-admin-only INSERT/UPDATE/DELETE policies); only the public **read** path changed.
+visibility — the original `zhk_read_all` policy (`using (true)`) let anyone, including anonymous
+unauthenticated clients, `select *` from `zhk` over the REST API directly, bypassing the app UI entirely.
+Since the subscription gate on `documentation`/`tech_status`/`violations`/`measures`/`court` (§7.1, §7.2)
+was originally enforced only in the Flutter widgets, that meant anyone who inspected network traffic (or
+just read the public anon key out of the client bundle — expected/normal for Supabase, not itself a bug)
+could fetch the full paid dataset for free, no subscription required. Two migrations fixed this in
+sequence:
+
+- `supabase/zhk_public_view.sql` added a `zhk_public` view that nulls out those five columns unless
+  `profiles.is_subscribed` is true for the requesting user; `ZhkRepository.fetchFromSupabase()` (the read
+  path used by the documents list, map, home catalog, and favorites) reads this view instead of the base
+  table.
+- `supabase/zhk_lock_table_access.sql` went further and closed the base table itself: `zhk_read_all` is
+  now `zhk_read_admin_only` (`using (is_admin())`), so even someone who finds/guesses the `zhk` table name
+  and queries it directly gets nothing unless they're an admin. For `zhk_public` to still work for
+  everyone else after that, it had to be recreated **without** `security_invoker` — a `security_invoker`
+  view runs with the *caller's* RLS, which would have made it as locked-down as the base table for
+  non-admins; without it, the view runs as its owner (bypasses RLS, sees every row) and does the
+  subscriber-check redaction itself.
+- Side effect: Supabase Realtime (Postgres Changes) enforces RLS when delivering change events, so once
+  `zhk` reads are admin-only, non-admins stop receiving `onPostgresChanges(table: 'zhk')` events entirely.
+  `map_screen.dart`'s live-refresh was switched to a `zhk-updates` Broadcast channel instead (not governed
+  by table RLS): every successful admin write to `zhk` calls `ZhkChangeNotifier.notifyChanged()`, which
+  every open map screen is listening for, triggering a plain re-fetch from `zhk_public`.
+
+Admin writes still go straight to the `zhk` table (unaffected, already gated by the existing admin-only
+INSERT/UPDATE/DELETE policies) — only the public **read** path and the realtime signal mechanism changed.
 
 ## 9. Explicitly out of scope / deliberate exclusions
 

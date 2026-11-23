@@ -12,6 +12,7 @@ import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
 import '../services/profile_service.dart';
 import '../services/settings_service.dart';
+import '../services/zhk_change_notifier.dart';
 import '../services/zhk_repository.dart';
 import '../widgets/zhk_preview_sheet.dart';
 import 'admin_zhk_edit_screen.dart';
@@ -69,15 +70,17 @@ class _MapScreenState extends State<MapScreen> {
   void _subscribeToRealtime() {
     final client = Supabase.instance.client;
 
-    // Карта: любое изменение в zhk (добавили/отредактировали/удалили/
-    // восстановили из корзины — с любого устройства или вкладки) —
-    // перезагружаем список без ручного refresh страницы.
+    // Карта: сигнал "реестр ЖК изменился" (добавили/отредактировали/
+    // удалили/восстановили из корзины — с любого устройства или
+    // вкладки) — перезагружаем список без ручного refresh страницы.
+    // Broadcast, а не Postgres Changes на таблице zhk: после того как
+    // прямое чтение zhk закрыто для всех, кроме админа (см.
+    // ZhkChangeNotifier), обычные пользователи не получали бы такие
+    // события вовсе — Supabase Realtime применяет RLS при доставке.
     _zhkChannel = client
-        .channel('public:zhk')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.all,
-          schema: 'public',
-          table: 'zhk',
+        .channel(ZhkChangeNotifier.channelName)
+        .onBroadcast(
+          event: ZhkChangeNotifier.event,
           callback: (payload) => _load(),
         )
         .subscribe();

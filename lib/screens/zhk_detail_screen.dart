@@ -7,6 +7,7 @@ import '../models/zhk.dart';
 import '../services/auth_service.dart';
 import '../services/favorites_service.dart';
 import '../services/profile_service.dart';
+import '../services/zhk_change_notifier.dart';
 import '../widgets/construction_status_row.dart';
 import '../widgets/responsive.dart';
 import '../widgets/zhk_photo_thumbnail.dart';
@@ -48,6 +49,7 @@ class ZhkDetailScreen extends StatelessWidget {
         }
         return;
       }
+      await ZhkChangeNotifier.notifyChanged();
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)

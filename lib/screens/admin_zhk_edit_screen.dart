@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../l10n/app_strings.dart';
 import '../models/app_city.dart';
 import '../services/settings_service.dart';
+import '../services/zhk_change_notifier.dart';
 import '../widgets/responsive.dart';
 
 /// Форма создания/редактирования объекта ЖК. Если [existing] передан —
@@ -141,6 +142,9 @@ class _AdminZhkEditScreenState extends State<AdminZhkEditScreen> {
       } else {
         await _client.from('zhk').insert(payload);
       }
+      // Прямое чтение zhk закрыто для не-админов — без широковещательного
+      // сигнала карта у остальных пользователей не узнала бы об изменении.
+      await ZhkChangeNotifier.notifyChanged();
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {

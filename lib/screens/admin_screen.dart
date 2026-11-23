@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../l10n/app_strings.dart';
 import '../models/app_city.dart';
+import '../services/zhk_change_notifier.dart';
 import '../widgets/grouped_list.dart';
 import '../widgets/responsive.dart';
 import 'admin_zhk_edit_screen.dart';
@@ -474,6 +475,8 @@ class _ZhkScreenState extends State<_ZhkScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.tr('admin_zhk_delete_not_found'))),
         );
+      } else {
+        await ZhkChangeNotifier.notifyChanged();
       }
     } catch (e) {
       if (mounted) {
@@ -653,6 +656,7 @@ class _TrashScreenState extends State<_TrashScreen> {
   Future<void> _restore(String id) async {
     try {
       await _client.from('zhk').update({'deleted_at': null}).eq('id', id);
+      await ZhkChangeNotifier.notifyChanged();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -679,6 +683,7 @@ class _TrashScreenState extends State<_TrashScreen> {
     if (confirmed != true) return;
     try {
       await _client.from('zhk').delete().eq('id', id);
+      await ZhkChangeNotifier.notifyChanged();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
