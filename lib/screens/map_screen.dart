@@ -462,16 +462,19 @@ class _MapScreenState extends State<MapScreen> {
                                       onChanged: (v) => setState(() => _searchQuery = v),
                                     ),
                                   ),
-                                  if (_searchQuery.isNotEmpty)
-                                    IconButton(
+                                  Visibility(
+                                    visible: _searchQuery.isNotEmpty,
+                                    maintainSize: true,
+                                    maintainAnimation: true,
+                                    maintainState: true,
+                                    child: IconButton(
                                       icon: const Icon(Icons.close, size: 18),
                                       onPressed: () {
                                         _searchController.clear();
                                         setState(() => _searchQuery = '');
                                       },
-                                    )
-                                  else
-                                    const SizedBox(width: 14),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -581,13 +584,15 @@ class _MapScreenState extends State<MapScreen> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _FilterChip(
-            label: context.tr(AppCity.labelKey(city)),
-            selected: true,
-            icon: Icons.expand_more,
-            onTap: _openCitySheet,
-          ),
-          const SizedBox(width: 8),
+          if (AppCity.all.length > 1) ...[
+            _FilterChip(
+              label: context.tr(AppCity.labelKey(city)),
+              selected: true,
+              icon: Icons.expand_more,
+              onTap: _openCitySheet,
+            ),
+            const SizedBox(width: 8),
+          ],
           _FilterChip(
             label: context.tr('filter_all'),
             selected: _filter == ZhkFilter.all,

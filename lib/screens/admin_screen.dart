@@ -497,6 +497,8 @@ class _ZhkScreenState extends State<_ZhkScreen> {
   }
 
   Widget _buildCityFilterRow(BuildContext context) {
+    // Фильтр по городу не нужен, пока город один.
+    if (AppCity.all.length <= 1) return const SizedBox.shrink();
     final colorScheme = Theme.of(context).colorScheme;
     Widget chip(String? city, String label) {
       final selected = _cityFilter == city;
@@ -981,40 +983,43 @@ class _ListingsScreenState extends State<_ListingsScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(context.tr('city_filter_all')),
-                      selected: _cityFilter == null,
-                      onSelected: (_) {
-                        setState(() => _cityFilter = null);
-                        _load();
-                      },
-                    ),
-                  ),
-                  for (final city in AppCity.all)
+          // Фильтр по городу не нужен, пока город один — "Все города"
+          // и "Алматы" были бы двумя чипами с одинаковым результатом.
+          if (AppCity.all.length > 1)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: SizedBox(
+                height: 36,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
-                        label: Text(context.tr(AppCity.labelKey(city))),
-                        selected: _cityFilter == city,
+                        label: Text(context.tr('city_filter_all')),
+                        selected: _cityFilter == null,
                         onSelected: (_) {
-                          setState(() => _cityFilter = city);
+                          setState(() => _cityFilter = null);
                           _load();
                         },
                       ),
                     ),
-                ],
+                    for (final city in AppCity.all)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(context.tr(AppCity.labelKey(city))),
+                          selected: _cityFilter == city,
+                          onSelected: (_) {
+                            setState(() => _cityFilter = city);
+                            _load();
+                          },
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())

@@ -12,7 +12,15 @@ class AppCity {
   static const astana = 'Астана';
   static const shymkent = 'Шымкент';
 
-  static const List<String> all = [almaty, astana, shymkent];
+  // Астана и Шымкент временно отключены из списка — реестра ЖК по ним
+  // ещё нет, показывать пустой город в переключателе только путает.
+  // Константы и переводы оставлены как есть — раскомментировать здесь,
+  // когда данные появятся, больше нигде ничего менять не нужно.
+  static const List<String> all = [
+    almaty,
+    // astana,
+    // shymkent,
+  ];
 
   /// l10n-ключ для отображаемого названия города.
   static String labelKey(String city) => switch (city) {

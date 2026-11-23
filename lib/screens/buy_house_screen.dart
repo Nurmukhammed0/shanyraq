@@ -223,8 +223,10 @@ class _BuyHouseScreenState extends State<BuyHouseScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
       children: [
-        _buildCityChip(context),
-        const SizedBox(height: 12),
+        if (AppCity.all.length > 1) ...[
+          _buildCityChip(context),
+          const SizedBox(height: 12),
+        ],
         _buildDisclaimer(context),
         const SizedBox(height: 16),
         if (filtered.isEmpty)

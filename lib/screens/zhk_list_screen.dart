@@ -226,16 +226,23 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
                           onChanged: (v) => setState(() => _searchQuery = v),
                         ),
                       ),
-                      if (_searchQuery.isNotEmpty)
-                        IconButton(
+                      // Visibility(maintainSize: true) вместо if/else с
+                      // SizedBox(14) — иначе место под кнопку очистки не
+                      // зарезервировано заранее, и строка поиска заметно
+                      // "прыгает" в момент появления/исчезновения кнопки.
+                      Visibility(
+                        visible: _searchQuery.isNotEmpty,
+                        maintainSize: true,
+                        maintainAnimation: true,
+                        maintainState: true,
+                        child: IconButton(
                           icon: const Icon(Icons.close, size: 18),
                           onPressed: () {
                             _searchController.clear();
                             setState(() => _searchQuery = '');
                           },
-                        )
-                      else
-                        const SizedBox(width: 14),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -245,13 +252,18 @@ class _ZhkListScreenState extends State<ZhkListScreen> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
-                      _FilterChip(
-                        label: context.tr(AppCity.labelKey(city)),
-                        selected: true,
-                        icon: Icons.expand_more,
-                        onTap: _openCitySheet,
-                      ),
-                      const SizedBox(width: 8),
+                      // Переключатель города не нужен, пока поддерживается
+                      // только один город — чип с шторкой на один вариант
+                      // выглядел бы как нерабочий элемент интерфейса.
+                      if (AppCity.all.length > 1) ...[
+                        _FilterChip(
+                          label: context.tr(AppCity.labelKey(city)),
+                          selected: true,
+                          icon: Icons.expand_more,
+                          onTap: _openCitySheet,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                       _FilterChip(
                         label: context.tr('filter_all'),
                         selected: _filter == ZhkFilter.all,
