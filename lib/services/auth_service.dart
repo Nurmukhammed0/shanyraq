@@ -41,7 +41,16 @@ class AuthService extends ChangeNotifier {
 
   Future<String?> signUp({required String email, required String password}) async {
     try {
-      await _client.auth.signUp(email: email, password: password);
+      await _client.auth.signUp(
+        email: email,
+        password: password,
+        // Тот же баг, что был у resetPasswordForEmail: без явного
+        // emailRedirectTo письмо с подтверждением email вело бы на
+        // голый домен (404 от GitHub Pages) вместо /shanyraq/.
+        emailRedirectTo: kIsWeb
+            ? 'https://nurmukhammed0.github.io/shanyraq/'
+            : 'io.supabase.shanyraq://login-callback',
+      );
       return null; // null = успех
     } on AuthException catch (e) {
       // code — машинно-читаемый и стабильный (не зависит от языка
@@ -103,7 +112,11 @@ class AuthService extends ChangeNotifier {
     try {
       await _client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: kIsWeb ? null : 'io.supabase.shanyraq://login-callback',
+        // redirectTo: null на вебе возвращал бы с Google на голый
+        // домен без /shanyraq/ — тот же баг, что у resetPasswordForEmail.
+        redirectTo: kIsWeb
+            ? 'https://nurmukhammed0.github.io/shanyraq/'
+            : 'io.supabase.shanyraq://login-callback',
       );
       return null;
     } on AuthException catch (e) {
