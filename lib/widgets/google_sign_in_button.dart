@@ -20,7 +20,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
     if (!mounted) return;
     setState(() => _loading = false);
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.trAuthError(error))));
     }
   }
 
