@@ -103,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   PasswordStrengthMeter(password: _password),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
-                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                    Text(context.trAuthError(_error!), style: const TextStyle(color: Colors.red)),
                   ],
                   if (_info != null) ...[
                     const SizedBox(height: 12),

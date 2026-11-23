@@ -71,7 +71,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     if (!mounted) return;
     setState(() => _saving = false);
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.trAuthError(error))));
       return;
     }
     ScaffoldMessenger.of(context)

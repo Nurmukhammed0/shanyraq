@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
-                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                    Text(context.trAuthError(_error!), style: const TextStyle(color: Colors.red)),
                   ],
                   const SizedBox(height: 12),
                   FilledButton(

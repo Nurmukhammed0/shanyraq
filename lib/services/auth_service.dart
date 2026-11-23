@@ -44,7 +44,12 @@ class AuthService extends ChangeNotifier {
       await _client.auth.signUp(email: email, password: password);
       return null; // null = успех
     } on AuthException catch (e) {
-      return e.message;
+      // code — машинно-читаемый и стабильный (не зависит от языка
+      // Supabase), в отличие от message, который приходит сырым
+      // английским текстом. Экраны переводят code через trAuthError();
+      // если кода нет (редкие ошибки без него), используем message как
+      // есть — английский текст лучше, чем пустая строка.
+      return e.code ?? e.message;
     } catch (e) {
       return 'Не удалось зарегистрироваться: $e';
     }
@@ -55,7 +60,7 @@ class AuthService extends ChangeNotifier {
       await _client.auth.signInWithPassword(email: email, password: password);
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return e.code ?? e.message;
     } catch (e) {
       return 'Не удалось войти: $e';
     }
@@ -86,7 +91,7 @@ class AuthService extends ChangeNotifier {
       );
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return e.code ?? e.message;
     } catch (e) {
       return 'Не удалось отправить письмо: $e';
     }
@@ -102,7 +107,7 @@ class AuthService extends ChangeNotifier {
       );
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return e.code ?? e.message;
     } catch (e) {
       return 'Не удалось войти через Google: $e';
     }
@@ -113,7 +118,7 @@ class AuthService extends ChangeNotifier {
       await _client.auth.updateUser(UserAttributes(password: newPassword));
       return null;
     } on AuthException catch (e) {
-      return e.message;
+      return e.code ?? e.message;
     } catch (e) {
       return 'Не удалось сменить пароль: $e';
     }

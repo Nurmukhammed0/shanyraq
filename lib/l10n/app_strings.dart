@@ -1794,6 +1794,49 @@ class AppStrings {
       AppLanguage.kz: 'Толығырақ (тек жазылым бойынша көрінеді)',
       AppLanguage.en: 'Details (visible with subscription only)',
     },
+
+    // Ошибки Supabase Auth (см. AppLocalization.trAuthError) — ключи
+    // совпадают с AuthException.code.
+    'auth_error_invalid_credentials': {
+      AppLanguage.ru: 'Неверный email или пароль',
+      AppLanguage.kz: 'Email немесе құпия сөз қате',
+      AppLanguage.en: 'Incorrect email or password',
+    },
+    'auth_error_email_not_confirmed': {
+      AppLanguage.ru: 'Email не подтверждён — проверьте почту и перейдите по ссылке из письма',
+      AppLanguage.kz: 'Email расталмаған — поштаңызды тексеріп, хаттағы сілтемеге өтіңіз',
+      AppLanguage.en: 'Email not confirmed — check your inbox and follow the link we sent',
+    },
+    'auth_error_user_already_exists': {
+      AppLanguage.ru: 'Аккаунт с таким email уже зарегистрирован',
+      AppLanguage.kz: 'Бұл email-мен аккаунт бұрыннан тіркелген',
+      AppLanguage.en: 'An account with this email already exists',
+    },
+    'auth_error_weak_password': {
+      AppLanguage.ru: 'Пароль слишком простой — выполните все требования ниже',
+      AppLanguage.kz: 'Құпия сөз тым қарапайым — төмендегі талаптарды орындаңыз',
+      AppLanguage.en: 'Password is too weak — meet all the requirements below',
+    },
+    'auth_error_over_email_send_rate_limit': {
+      AppLanguage.ru: 'Слишком много попыток отправки письма — попробуйте позже',
+      AppLanguage.kz: 'Хат жіберу әрекеттері тым көп — кейінірек қайталап көріңіз',
+      AppLanguage.en: 'Too many emails sent — please try again later',
+    },
+    'auth_error_over_request_rate_limit': {
+      AppLanguage.ru: 'Слишком много попыток — попробуйте через несколько минут',
+      AppLanguage.kz: 'Әрекеттер тым көп — бірнеше минуттан кейін қайталап көріңіз',
+      AppLanguage.en: 'Too many attempts — please try again in a few minutes',
+    },
+    'auth_error_same_password': {
+      AppLanguage.ru: 'Новый пароль должен отличаться от текущего',
+      AppLanguage.kz: 'Жаңа құпия сөз ағымдағыдан өзгеше болуы керек',
+      AppLanguage.en: 'The new password must be different from the current one',
+    },
+    'auth_error_signup_disabled': {
+      AppLanguage.ru: 'Регистрация новых пользователей сейчас отключена',
+      AppLanguage.kz: 'Жаңа пайдаланушыларды тіркеу қазір өшірулі',
+      AppLanguage.en: 'New sign-ups are currently disabled',
+    },
   };
 }
 
@@ -1802,5 +1845,28 @@ extension AppLocalization on BuildContext {
   String tr(String key, [Map<String, String>? params]) {
     final language = Provider.of<SettingsService>(this, listen: true).language;
     return AppStrings(language).t(key, params);
+  }
+
+  /// Переводит ошибку Supabase Auth. AuthService возвращает
+  /// AuthException.code, когда он есть (стабильная машинно-читаемая
+  /// строка вроде 'email_not_confirmed') — иначе сырое сообщение
+  /// Supabase как есть (редкие ошибки без code; английский текст лучше
+  /// пустого экрана). Без этого любая ошибка входа/регистрации
+  /// показывалась бы на английском независимо от выбранного языка.
+  String trAuthError(String codeOrMessage) {
+    const knownCodes = {
+      'invalid_credentials',
+      'email_not_confirmed',
+      'user_already_exists',
+      'weak_password',
+      'over_email_send_rate_limit',
+      'over_request_rate_limit',
+      'same_password',
+      'signup_disabled',
+    };
+    if (knownCodes.contains(codeOrMessage)) {
+      return tr('auth_error_$codeOrMessage');
+    }
+    return codeOrMessage;
   }
 }
