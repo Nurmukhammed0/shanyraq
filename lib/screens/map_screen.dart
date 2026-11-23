@@ -135,22 +135,27 @@ class _MapScreenState extends State<MapScreen> {
     return _all.where((z) => z.city == city).toList();
   }
 
+  // См. zhk_list_screen.dart — тот же приём: статус/район параметрами,
+  // чтобы использовать и для реального списка, и для черновых значений
+  // в шторке фильтров (живой счётчик "Показать (N)" до применения).
+  bool _matches(Zhk z, {required ZhkFilter filter, required String? district}) {
+    final statusOk = switch (filter) {
+      ZhkFilter.all => true,
+      ZhkFilter.problematic => z.status == 'problematic',
+      ZhkFilter.completedGuaranteed => z.status == 'completed_guaranteed',
+    };
+    final districtOk = district == null || z.district == district;
+    final query = _searchQuery.trim().toLowerCase();
+    final searchOk = query.isEmpty ||
+        z.name.toLowerCase().contains(query) ||
+        (z.address?.toLowerCase().contains(query) ?? false);
+    return statusOk && districtOk && searchOk && z.hasCoordinates;
+  }
+
   List<Zhk> get _filtered {
     final isSubscribed = context.read<ProfileService>().isSubscribed;
     final effectiveFilter = isSubscribed ? _filter : ZhkFilter.all;
-    return _byCity.where((z) {
-      final statusOk = switch (effectiveFilter) {
-        ZhkFilter.all => true,
-        ZhkFilter.problematic => z.status == 'problematic',
-        ZhkFilter.completedGuaranteed => z.status == 'completed_guaranteed',
-      };
-      final districtOk = _districtFilter == null || z.district == _districtFilter;
-      final query = _searchQuery.trim().toLowerCase();
-      final searchOk = query.isEmpty ||
-          z.name.toLowerCase().contains(query) ||
-          (z.address?.toLowerCase().contains(query) ?? false);
-      return statusOk && districtOk && searchOk && z.hasCoordinates;
-    }).toList();
+    return _byCity.where((z) => _matches(z, filter: effectiveFilter, district: _districtFilter)).toList();
   }
 
   List<String> get _districts {
@@ -245,43 +250,144 @@ class _MapScreenState extends State<MapScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _openDistrictSheet() async {
-    final colorScheme = Theme.of(context).colorScheme;
+  // См. zhk_list_screen.dart — тот же паттерн: кнопка "Фильтры" ->
+  // шторка со статусом и районом -> "Показать" применяет разом.
+  Future<void> _openFiltersSheet() async {
+    final profile = context.read<ProfileService>();
+    var localFilter = _filter;
+    var localDistrict = _districtFilter;
+
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Text(context.tr('filter_district_hint'),
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            ),
-            ListTile(
-              title: Text(context.tr('filter_district_all')),
-              trailing: _districtFilter == null ? Icon(Icons.check, color: colorScheme.primary) : null,
-              onTap: () {
-                setState(() => _districtFilter = null);
-                Navigator.pop(ctx);
-              },
-            ),
-            ..._districts.map((d) => ListTile(
-                  title: Text(d),
-                  trailing: _districtFilter == d ? Icon(Icons.check, color: colorScheme.primary) : null,
-                  onTap: () {
-                    setState(() => _districtFilter = d);
-                    Navigator.pop(ctx);
-                  },
-                )),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final colorScheme = Theme.of(ctx).colorScheme;
+            final effectiveLocalFilter = profile.isSubscribed ? localFilter : ZhkFilter.all;
+            final matchCount = _byCity
+                .where((z) => _matches(z, filter: effectiveLocalFilter, district: localDistrict))
+                .length;
+
+            Widget statusTile({
+              required ZhkFilter value,
+              required String label,
+              Color? dotColor,
+              bool locked = false,
+            }) {
+              final selected = localFilter == value;
+              return ListTile(
+                leading: dotColor == null
+                    ? const SizedBox(width: 10)
+                    : Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
+                      ),
+                title: Text(label),
+                trailing: locked
+                    ? Icon(Icons.lock_outline, size: 18, color: colorScheme.onSurfaceVariant)
+                    : (selected ? Icon(Icons.check, color: colorScheme.primary) : null),
+                onTap: locked
+                    ? () {
+                        Navigator.pop(ctx);
+                        _openSubscription();
+                      }
+                    : () => setSheetState(() => localFilter = value),
+              );
+            }
+
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 8, 4),
+                    child: Row(
+                      children: [
+                        Text(context.tr('filters_button'),
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => setSheetState(() {
+                            localFilter = ZhkFilter.all;
+                            localDistrict = null;
+                          }),
+                          child: Text(context.tr('filters_reset')),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+                          child: Text(context.tr('filters_status_section'),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 12.5, color: colorScheme.onSurfaceVariant)),
+                        ),
+                        statusTile(value: ZhkFilter.all, label: context.tr('filter_all')),
+                        statusTile(
+                          value: ZhkFilter.problematic,
+                          label: context.tr('filter_problematic'),
+                          dotColor: const Color(0xFFE24B4A),
+                          locked: !profile.isSubscribed,
+                        ),
+                        statusTile(
+                          value: ZhkFilter.completedGuaranteed,
+                          label: context.tr('filter_guaranteed'),
+                          dotColor: const Color(0xFF22C55E),
+                          locked: !profile.isSubscribed,
+                        ),
+                        const Divider(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+                          child: Text(context.tr('filter_district_hint'),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 12.5, color: colorScheme.onSurfaceVariant)),
+                        ),
+                        ListTile(
+                          title: Text(context.tr('filter_district_all')),
+                          trailing:
+                              localDistrict == null ? Icon(Icons.check, color: colorScheme.primary) : null,
+                          onTap: () => setSheetState(() => localDistrict = null),
+                        ),
+                        ..._districts.map((d) => ListTile(
+                              title: Text(d),
+                              trailing:
+                                  localDistrict == d ? Icon(Icons.check, color: colorScheme.primary) : null,
+                              onTap: () => setSheetState(() => localDistrict = d),
+                            )),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                      onPressed: () {
+                        setState(() {
+                          _filter = localFilter;
+                          _districtFilter = localDistrict;
+                        });
+                        Navigator.pop(ctx);
+                      },
+                      child: Text(context.tr('filters_show_results', {'n': '$matchCount'})),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -455,6 +561,8 @@ class _MapScreenState extends State<MapScreen> {
                                       decoration: InputDecoration(
                                         hintText: context.tr('search_hint'),
                                         border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
                                         isDense: true,
                                         filled: false,
                                         contentPadding: const EdgeInsets.symmetric(vertical: 14),
@@ -462,19 +570,16 @@ class _MapScreenState extends State<MapScreen> {
                                       onChanged: (v) => setState(() => _searchQuery = v),
                                     ),
                                   ),
-                                  Visibility(
-                                    visible: _searchQuery.isNotEmpty,
-                                    maintainSize: true,
-                                    maintainAnimation: true,
-                                    maintainState: true,
-                                    child: IconButton(
+                                  if (_searchQuery.isNotEmpty)
+                                    IconButton(
                                       icon: const Icon(Icons.close, size: 18),
                                       onPressed: () {
                                         _searchController.clear();
                                         setState(() => _searchQuery = '');
                                       },
-                                    ),
-                                  ),
+                                    )
+                                  else
+                                    const SizedBox(width: 14),
                                 ],
                               ),
                             ),
@@ -504,7 +609,7 @@ class _MapScreenState extends State<MapScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      _buildChipsRow(profile),
+                      _buildChipsRow(),
                     ],
                   ),
                 ),
@@ -577,12 +682,11 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  Widget _buildChipsRow(ProfileService profile) {
+  Widget _buildChipsRow() {
     final city = context.watch<SettingsService>().city;
     return SizedBox(
       height: 36,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
+      child: Row(
         children: [
           if (AppCity.all.length > 1) ...[
             _FilterChip(
@@ -593,37 +697,9 @@ class _MapScreenState extends State<MapScreen> {
             ),
             const SizedBox(width: 8),
           ],
-          _FilterChip(
-            label: context.tr('filter_all'),
-            selected: _filter == ZhkFilter.all,
-            onTap: () => setState(() => _filter = ZhkFilter.all),
-          ),
-          const SizedBox(width: 8),
-          _FilterChip(
-            label: context.tr('filter_problematic'),
-            selected: _filter == ZhkFilter.problematic,
-            dotColor: const Color(0xFFE24B4A),
-            locked: !profile.isSubscribed,
-            onTap: profile.isSubscribed
-                ? () => setState(() => _filter = ZhkFilter.problematic)
-                : _openSubscription,
-          ),
-          const SizedBox(width: 8),
-          _FilterChip(
-            label: context.tr('filter_guaranteed'),
-            selected: _filter == ZhkFilter.completedGuaranteed,
-            dotColor: const Color(0xFF22C55E),
-            locked: !profile.isSubscribed,
-            onTap: profile.isSubscribed
-                ? () => setState(() => _filter = ZhkFilter.completedGuaranteed)
-                : _openSubscription,
-          ),
-          const SizedBox(width: 8),
-          _FilterChip(
-            label: _districtFilter ?? context.tr('filter_district_hint'),
-            selected: _districtFilter != null,
-            icon: Icons.expand_more,
-            onTap: _openDistrictSheet,
+          _FiltersButton(
+            active: _filter != ZhkFilter.all || _districtFilter != null,
+            onTap: _openFiltersSheet,
           ),
         ],
       ),
@@ -736,6 +812,42 @@ class _FilterChip extends StatelessWidget {
                 const SizedBox(width: 2),
                 Icon(icon, size: 16, color: fg.withOpacity(0.8)),
               ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// См. zhk_list_screen.dart — тот же виджет, своя копия (приватный
+/// класс, файл не делится кодом с экраном списка).
+class _FiltersButton extends StatelessWidget {
+  final bool active;
+  final VoidCallback onTap;
+  const _FiltersButton({required this.active, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final fg = active ? colorScheme.onPrimary : colorScheme.onSurface;
+    return Material(
+      color: active ? colorScheme.primary : colorScheme.surface,
+      borderRadius: BorderRadius.circular(10),
+      elevation: 2,
+      shadowColor: Colors.black26,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.tune, size: 17, color: fg),
+              const SizedBox(width: 6),
+              Text(context.tr('filters_button'),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: fg)),
             ],
           ),
         ),

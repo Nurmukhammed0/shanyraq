@@ -116,6 +116,18 @@ class AppStrings {
       AppLanguage.kz: 'Барлық аудандар',
       AppLanguage.en: 'All districts',
     },
+    'filters_button': {AppLanguage.ru: 'Фильтры', AppLanguage.kz: 'Сүзгілер', AppLanguage.en: 'Filters'},
+    'filters_reset': {AppLanguage.ru: 'Сбросить', AppLanguage.kz: 'Тазалау', AppLanguage.en: 'Reset'},
+    'filters_status_section': {
+      AppLanguage.ru: 'Статус',
+      AppLanguage.kz: 'Мәртебесі',
+      AppLanguage.en: 'Status',
+    },
+    'filters_show_results': {
+      AppLanguage.ru: 'Показать ({n})',
+      AppLanguage.kz: 'Көрсету ({n})',
+      AppLanguage.en: 'Show ({n})',
+    },
     'search_hint': {
       AppLanguage.ru: 'Поиск по названию или адресу',
       AppLanguage.kz: 'Атауы немесе мекенжайы бойынша іздеу',
