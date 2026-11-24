@@ -1,9 +1,10 @@
 # Shanyraq (Шаңырақ) — Product Requirements Document
 
-**Status:** Live beta, single-city (Almaty) MVP
+**Status:** Live beta, single-city (Almaty) MVP — multi-city architecture is built and tested but
+intentionally left disabled (see §7.7) until a second city's registry data actually exists.
 **Live URL:** https://nurmukhammed0.github.io/shanyraq/
 **Repository:** github.com/Nurmukhammed0/shanyraq
-**Last updated:** 2026-11-20
+**Last updated:** 2026-11-24
 
 ---
 
@@ -47,14 +48,15 @@ product name itself is not translated.
 - Work equally well as a phone app (bottom navigation) and as a desktop/tablet site (sidebar navigation),
   from one Flutter Web codebase.
 - Ship in Russian, Kazakh and English throughout the user-facing app, including the admin panel.
-- Support more than one city (Almaty, Astana, Shymkent) with a single app-wide city switcher shared
-  across the documents list, map, home catalog and the Buy-a-home marketplace.
+- Be *able to* support more than one city (Almaty, Astana, Shymkent) with a single app-wide city switcher
+  shared across the documents list, map, home catalog and the Buy-a-home marketplace — built, but
+  currently switched off (§7.7) since only Almaty has real registry data.
 
 **Non-goals (for this version)**
 - Real payment processing (subscription payment is currently simulated — see §9).
 - Native iOS/Android store distribution (web-only for now).
-- Any city beyond the fixed three-city list below (adding a fourth city is a data-entry/registry task,
-  not a code change — see §7.7).
+- Actually showing a second city to users today — the architecture no longer blocks it (§7.7), but no
+  one has sourced Astana's or Shymkent's red-zone/guaranteed-completion registry data yet.
 - Aggregating or scraping third-party listing inventory (see §9).
 
 ## 4. Target users
@@ -92,13 +94,19 @@ The sidebar can be collapsed to an icon-only rail with an animated width/label t
 - **Home** — ad/promo banner (currently self-promotional; literally labelled as an ad slot, with
   "your ad could be here" copy for future advertisers), a live "N complexes tracked" counter, and a
   7-item preview catalog mixing problematic/guaranteed objects.
-- **New-building documents** (ЖК list) — searchable, filterable (status, district; city is fixed to
-  Almaty today) list/grid of all tracked complexes → tap through to **Complex detail**.
+- **New-building documents** (ЖК list) — a search bar plus a single **«Фильтры»** button (city chip
+  hidden while only one city is active, §7.7) that opens a two-level bottom sheet: a root screen listing
+  filter *categories* (Статус, Район) each showing their current value, tapping one drills into that
+  category's options with a back arrow, and a bottom "Показать (N)" button (live count, computed from the
+  in-progress draft selection) commits the whole batch at once — replaced an earlier always-visible
+  horizontal chip row, which stopped scaling once there were two filter categories and wouldn't scale
+  further if more are added later (see §10) → tap a complex to reach **Complex detail**.
 - **Complex detail** — photo, status badge, free construction-status/year, paywalled
   documentation/violations/measures/court fields, "report an issue," favorite toggle, admin edit/delete.
-- **Map** — flutter_map on OpenStreetMap raster tiles, custom teardrop pin markers colored by status,
-  same filters as the list, geolocation, long-press-to-add for admins. Reached via a "Map" button from
-  the documents list (carries the list's current filters with it), not a top-level destination.
+- **Map** — flutter_map on OpenStreetMap raster tiles, custom teardrop pin markers colored by status, the
+  same two-level «Фильтры» sheet as the documents list, geolocation, long-press-to-add for admins. Reached
+  via a "Map" button from the documents list (carries the list's current filters with it), not a
+  top-level destination.
 - **Buy a home** — feed of **approved** owner listings only; a floating "Add listing" action (locked
   behind subscription + login); "My listings" to see the status of one's own submissions
   (pending / approved / rejected); a disclaimer that Shanyraq does not verify documents or deal terms
@@ -148,13 +156,20 @@ The sidebar can be collapsed to an icon-only rail with an animated width/label t
 - **Users:** create (via `admin-create-user` Edge Function, since client-side Supabase Auth can't create
   other users), toggle role/subscription, block/unblock, delete (via SECURITY DEFINER RPCs
   `admin_set_blocked` / `admin_delete_user`).
-- **Complex objects:** add/edit (reuses the same form for both), soft-delete to Trash.
-- **Trash:** restore or permanently delete a soft-deleted complex.
-- **Reports:** user-submitted "something's wrong with this complex" issues, with an open/resolved toggle.
-- **Buy-a-home listings:** moderation queue filterable by status, approve/reject per listing.
+- **Complex objects:** add/edit (reuses the same form for both), soft-delete to Trash. City field in the
+  form, and a city filter row in the list (both hidden while `AppCity.all` has only one entry, §7.7).
+- **Trash:** restore or permanently delete a soft-deleted complex; city shown per row.
+- **Reports:** user-submitted "something's wrong with this complex" issues, with an open/resolved toggle;
+  city shown per row (joined from `zhk`).
+- **Buy-a-home listings:** moderation queue filterable by status (and by city, same hide-if-one-city
+  rule), approve/reject per listing.
 - **Statistics:** counts of active/trashed complexes, total/subscribed users, open reports.
 - Fully localized RU/KZ/EN (this was originally Russian-only by deliberate scope cut, then completed in
   full at the user's request — see §10).
+- Admin writes to `zhk` (create/edit/soft-delete/restore/permanently-delete) each call
+  `ZhkChangeNotifier.notifyChanged()` after a successful write — see §8's `zhk_public` note for why this
+  exists (plain Postgres Changes stopped reaching non-admin viewers once direct `zhk` reads became
+  admin-only).
 
 ### 7.5 Internationalization
 - Custom lightweight dictionary-based system (`lib/l10n/app_strings.dart`), **not**
@@ -162,16 +177,29 @@ The sidebar can be collapsed to an icon-only rail with an animated width/label t
   `context.tr('key', {params})` extension. Three languages: Russian, Kazakh, English, switchable in
   Settings and persisted via `SharedPreferences`.
 - The product's own name is the one deliberate exception to translation (see §1).
+- Supabase Auth errors (wrong password, email not confirmed, rate-limited, …) used to leak straight
+  through as `AuthException.message` — raw English, regardless of the selected app language. Found while
+  testing the forgot-password flow (§7.8) with an unconfirmed test account. `AuthService` now returns
+  `AuthException.code` (a stable machine-readable string like `email_not_confirmed`) instead of the
+  message when one is available, and a `context.trAuthError()` extension (next to `context.tr`) maps the
+  known codes to translated strings, falling back to the raw message only for the rare error that has no
+  code.
 
 ### 7.6 Notifications
 - In-app only (no push yet): a badge/counter on the map and a Notifications screen listing status
   changes (`zhk_status_log`) for the user's favorited complexes. Can be toggled off in Settings.
 
 ### 7.7 Multi-city
-- Supported cities are a fixed, hand-maintained list (`AppCity.all` in `lib/models/app_city.dart`):
-  Almaty, Astana, Shymkent. Adding a fourth city means appending it there (plus translated labels in
-  `app_strings.dart`, a map-center entry in `map_screen.dart`, and populating `zhk` rows for it) — it is a
-  data-entry step, not a schema change, because `zhk.city` and `listings.city` already exist.
+- Supported cities are a fixed, hand-maintained list (`AppCity.all` in `lib/models/app_city.dart`). It was
+  shipped with all three entries live (Almaty, Astana, Shymkent) and the full city-switcher UI (a chip
+  opening a city picker, everywhere the registry is browsed), then almost immediately scaled back to just
+  Almaty — showing a switcher for cities with zero registry rows read as broken, not "coming soon." Astana
+  and Shymkent stay defined as constants (with translated labels already in `app_strings.dart` and map
+  centers already in `map_screen.dart`) but commented out of the `all` list; re-enabling a city later is
+  uncommenting one line, not new code.
+- Every screen that shows a city chip/filter (documents list, map, Buy-a-home, both admin moderation
+  queues) guards it with `if (AppCity.all.length > 1)` — so the instant a second city is uncommented, the
+  switcher reappears everywhere at once, with nothing else to wire up.
 - The selected city is one piece of global state (`SettingsService.city`, persisted via
   `SharedPreferences`, same mechanism as the language setting) — not a per-screen filter — so switching
   city on the documents list carries over to the map, the home catalog preview, and the Buy-a-home feed.
@@ -181,6 +209,8 @@ The sidebar can be collapsed to an icon-only rail with an animated width/label t
   admin's "add ЖК by long-press" inherits the currently-selected city automatically.
 - Buy-a-home listings also carry a `city` (owner-selected when posting, defaulting to the app's current
   city) and the marketplace feed filters to the selected city the same way the ЖК list does.
+- Adding a real fourth+ city later is still the data-entry step described above (plus populating `zhk`
+  rows for it) — not a schema change, because `zhk.city` and `listings.city` already exist.
 
 ### 7.8 Authentication
 - Email+password (Supabase Auth) and Google OAuth. Login is required to use the app at all (`AuthGate`
@@ -195,11 +225,30 @@ The sidebar can be collapsed to an icon-only rail with an animated width/label t
   needed — the link itself already proved mail ownership) instead of straight into the app with
   whatever password they were trying to replace. Saving the new password clears the flag and the gate
   falls through to the normal `AppShell`.
-- **Operational dependency:** the recovery email's link redirect target comes from the Supabase
-  project's own **Authentication → URL Configuration → Site URL / Redirect URLs** setting, not from
-  app code — it must include the deployed GitHub Pages URL (and `localhost` for local dev) or the link
-  will redirect somewhere wrong. Also subject to the same built-in Supabase email rate limits noted in
-  §11 (custom SMTP follow-up).
+- **Redirect target is set explicitly in code, not left to Supabase's default.** `resetPasswordForEmail`,
+  `signUp` (`emailRedirectTo`), and `signInWithGoogle` (`redirectTo`) all pass
+  `https://nurmukhammed0.github.io/shanyraq/` explicitly for web. Leaving any of them unset (`null`) makes
+  supabase_flutter fall back to the current page's bare origin (`.../github.io/`, no `/shanyraq/` path) —
+  which 404s on GitHub Pages — regardless of what the Supabase dashboard's Site URL says. Found via the
+  password-recovery link first (see §10), then proactively checked and fixed the same way in the other
+  two, since all three share the identical default-redirect code path.
+- **Auth flow type is `AuthFlowType.implicit`, set explicitly in `Supabase.initialize()`** — not the
+  supabase_flutter default (`AuthFlowType.pkce`). PKCE stores the code-exchange secret in the *initiating*
+  browser's local storage; a password-recovery email is close to always opened in a *different*
+  browser/device than the one that requested it, where that secret doesn't exist, so the code-exchange
+  silently fails (no error — the link just quietly fails to establish a session). Implicit flow embeds the
+  session tokens directly in the redirect URL fragment instead, so it works regardless of where the link
+  is opened. See §10 for how this was diagnosed.
+- **Why `AuthService.isPasswordRecovery` is seeded from the URL in `main()`, not only from the
+  `AuthChangeEvent.passwordRecovery` stream event:** `onAuthStateChange` is a broadcast stream with no
+  replay — GoTrue can process the recovery link and emit that event *during* `Supabase.initialize()`,
+  before `AuthService`'s constructor (created afterward, in `main()`'s `runApp`) has subscribed to
+  anything. `main()` parses `Uri.base` for `type=recovery` *before* calling `Supabase.initialize()` and
+  passes that as `AuthService(initialPasswordRecovery: ...)`, so the recovery state is known independent
+  of whether the stream event is ever actually caught. The event listener is kept as a secondary path.
+  `AuthGate` shows a timeout-guarded spinner (`_PasswordRecoveryWaiting`) while a recovery link's session
+  is still being established, with a manual "back to login" escape hatch if it never completes (expired
+  or already-used link).
 
 ## 8. Data model (Supabase / Postgres)
 
@@ -264,8 +313,16 @@ INSERT/UPDATE/DELETE policies) — only the public **read** path and the realtim
 - **Legal copy is a draft.** Privacy policy and terms of service are deliberately short placeholder text,
   flagged in source comments to be reviewed by an actual lawyer before any app-store submission or paid
   launch.
-- **Single city.** All data and the "city" filter chip are hard-coded to Almaty; the schema doesn't
-  prevent adding more cities later, but nothing today makes that easy.
+- **Single city, by data availability rather than by architecture.** The multi-city switcher, schema
+  columns, and per-screen filtering all exist and work (§7.7); only Almaty is turned on because no one has
+  sourced Astana's or Shymkent's registry data yet.
+- **Buy-a-home listings' phone numbers/contact names are publicly readable by anyone, including
+  unauthenticated scrapers** (`listings_read_all`: `status = 'approved'`, no auth check). Considered
+  alongside the `zhk` paywall-bypass fix (§8) and *not* changed: unlike the paywall case, showing a
+  seller's contact info to any prospective buyer — logged in or not — is the explicit point of a public
+  real-estate listing (same as Krisha.kz, OLX, or any classifieds site), not an accidental leak of
+  something meant to be gated. Revisit only if bulk-harvesting by competitors becomes an actual observed
+  problem, not preemptively.
 
 ## 10. Incident log (decisions worth remembering)
 
@@ -284,6 +341,28 @@ INSERT/UPDATE/DELETE policies) — only the public **read** path and the realtim
 - **Sidebar collapse-animation bug.** The collapsed/expanded icon row used to snap its alignment and
   padding instantly while only the container width animated, making the selection highlight visibly jump.
   Fixed by keeping the icon's position constant in both states and animating only the label's width/opacity.
+- **Password-reset link 404'd, and the real cause wasn't where it looked.** First symptom: the emailed
+  link opened `https://nurmukhammed0.github.io/` (no `/shanyraq/`) → GitHub Pages 404. Looked like a
+  Supabase dashboard **Site URL** misconfiguration; the user's screenshot showed it set correctly, Save
+  clicked. Root cause was actually in the client: `resetPasswordForEmail(..., redirectTo: null)` on web
+  makes supabase_flutter default to the page's bare origin, ignoring the dashboard's Site URL entirely.
+  Fixed by passing the full URL explicitly (see §7.8) — then found and pre-emptively fixed the identical
+  default in `signUp` and `signInWithGoogle` too.
+- **...then the (now-correct) link still didn't show the reset-password screen.** Two compounding causes,
+  found in sequence: (1) `AuthChangeEvent.passwordRecovery` was firing but being missed —
+  `onAuthStateChange` has no replay, and GoTrue can emit it during `Supabase.initialize()`, before
+  `AuthService` exists to listen (fixed by reading the URL in `main()` first, see §7.8); (2) even after
+  that fix, a test performed on a different device than the one that requested the reset still silently
+  failed — traced to PKCE's code-exchange secret living only in the *requesting* browser's local storage,
+  which is close to never the device someone opens a password-recovery email on. Fixed by switching the
+  whole app to `AuthFlowType.implicit` (§7.8), which doesn't need that secret at all.
+- **The subscription paywall had no backend enforcement — anyone could read it for free.** Discovered
+  while deliberately checking "can someone copy our data" after an unrelated feature request. Row Level
+  Security restricts which *rows* a query can see, not which *columns* — `zhk_read_all`'s `using (true)`
+  meant any anonymous request to `/rest/v1/zhk?select=*` returned the paid `documentation`/`violations`/
+  etc. fields in full; the subscription check lived only in the Flutter widgets. Confirmed with a live
+  `curl` against the production API before and after each fix (see §8 for the two-migration fix and the
+  Realtime side effect it caused).
 
 ## 11. Known follow-ups (not yet done)
 
@@ -292,8 +371,12 @@ INSERT/UPDATE/DELETE policies) — only the public **read** path and the realtim
 - Custom SMTP for Supabase auth emails (the built-in email service has strict hourly rate limits, fine
   for current scale, not for production volume).
 - Native mobile app packaging, if/when warranted.
-- A fourth+ city: possible today without a schema change (see §7.7), but still needs someone to source
-  and enter that city's red-zone/guaranteed-completion registry data.
+- Re-enabling Astana/Shymkent (or adding a true fourth city): the switcher, schema, and per-screen
+  filtering already work (§7.7) — this is purely "source that city's red-zone/guaranteed-completion
+  registry data, add the rows, uncomment one line in `AppCity.all`," not a development task.
+- A bulk CSV/JSON import tool for the `zhk` registry — floated when discussing how a second city's data
+  would get entered, not yet built. Today, adding complexes means the one-at-a-time admin form; fine for
+  occasional edits to ~38 rows, painful for onboarding an entire new city at once.
 
 ## 12. Tech stack reference
 
